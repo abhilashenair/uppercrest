@@ -189,22 +189,33 @@
     @media(max-width:980px){.footer-grid{grid-template-columns:repeat(2,1fr)}}
     @media(max-width:620px){.footer-grid{grid-template-columns:1fr;gap:24px}}
 
-  /* ── Booking Section ── */
-  .booking-box{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:40px;max-width:780px;margin:0 auto}
-  .booking-box h2{color:var(--dark);font-size:clamp(24px,3vw,34px);margin-bottom:8px;letter-spacing:-.5px}
-  .booking-box .sub{color:var(--muted);margin-bottom:30px;font-size:16px}
-  .date-row{display:grid;grid-template-columns:1fr 1fr auto;gap:16px;align-items:end;margin-bottom:20px}
-  .field label{display:block;font-weight:800;color:var(--dark);margin-bottom:6px;font-size:14px}
-  .field input{width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:14px;font-size:15px;color:var(--dark);background:var(--cream);outline:none;transition:border-color .2s}
-  .field input:focus{border-color:var(--brown)}
-  .avail-result{border-radius:14px;padding:14px 18px;font-weight:800;font-size:15px;margin-bottom:20px;display:none}
+  /* ── Booking Bar ── */
+  .booking-bar-wrap{background:var(--white);border-bottom:1px solid var(--border);box-shadow:0 4px 24px rgba(23,19,15,.08);position:relative;z-index:10}
+  .booking-bar{display:flex;align-items:flex-end;gap:14px;padding:22px 0;flex-wrap:wrap}
+  .booking-bar .field{flex:1;min-width:160px}
+  .booking-bar .field label{display:block;font-weight:800;color:var(--dark);margin-bottom:6px;font-size:13px;text-transform:uppercase;letter-spacing:.4px}
+  .booking-bar .field input{width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:14px;font-size:15px;color:var(--dark);background:var(--cream);outline:none;transition:border-color .2s;cursor:pointer}
+  .booking-bar .field input:focus{border-color:var(--brown)}
+  .booking-bar .btn{flex-shrink:0;padding:13px 28px;font-size:15px;border-radius:14px}
+  .avail-result{border-radius:14px;padding:13px 18px;font-weight:800;font-size:15px;margin-top:8px;display:none;width:100%}
   .avail-result.available{background:rgba(31,138,91,.1);color:#1f8a5b;border:1px solid rgba(31,138,91,.25)}
   .avail-result.unavailable{background:rgba(200,60,60,.08);color:#b93030;border:1px solid rgba(200,60,60,.2)}
-  .guest-form{display:none;border-top:1px solid var(--border);padding-top:24px;margin-top:4px}
-  .guest-form .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-  .checkin-note{font-size:13px;color:var(--muted);margin-top:16px;text-align:center}
-  .nights-badge{display:inline-block;background:rgba(200,155,60,.15);color:var(--brown);border-radius:999px;padding:4px 14px;font-size:13px;font-weight:800;margin-bottom:20px}
-  @media(max-width:680px){.date-row{grid-template-columns:1fr 1fr}.date-row .btn{grid-column:span 2}.guest-form .form-row{grid-template-columns:1fr}.booking-box{padding:24px}}
+  .guest-form{display:none;border-top:1px solid var(--border);padding:22px 0 10px;width:100%}
+  .guest-form .form-row{display:grid;grid-template-columns:1fr 1fr auto;gap:14px;align-items:end}
+  .guest-form .field input{width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:14px;font-size:15px;color:var(--dark);background:var(--cream);outline:none;transition:border-color .2s}
+  .guest-form .field input:focus{border-color:var(--brown)}
+  .checkin-note{font-size:12px;color:var(--muted);margin-top:12px}
+  .nights-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(200,155,60,.15);color:var(--brown);border-radius:999px;padding:5px 14px;font-size:13px;font-weight:800;margin-bottom:16px}
+  @media(max-width:768px){
+    .booking-bar{gap:12px}
+    .booking-bar .field{min-width:calc(50% - 7px)}
+    .booking-bar .btn{width:100%;justify-content:center}
+    .guest-form .form-row{grid-template-columns:1fr;gap:12px}
+    .guest-form .form-row .btn{width:100%;padding:14px}
+  }
+  @media(max-width:480px){
+    .booking-bar .field{min-width:100%}
+  }
   </style>
 
   <!-- ═══ SCHEMA.ORG — LodgingBusiness (primary) ═══ -->
@@ -427,6 +438,39 @@
       </div>
     </section>
 
+    <!-- ── Booking Bar ── -->
+    <div class="booking-bar-wrap" id="booking">
+      <div class="container">
+        <div class="booking-bar">
+          <div class="field">
+            <label>Check-in Date</label>
+            <input type="text" id="checkin" placeholder="Select date" readonly />
+          </div>
+          <div class="field">
+            <label>Check-out Date</label>
+            <input type="text" id="checkout" placeholder="Select date" readonly />
+          </div>
+          <button class="btn btn-primary" id="checkBtn" onclick="checkAvailability()">Check Availability</button>
+          <div class="avail-result" id="availResult"></div>
+          <div class="guest-form" id="guestForm">
+            <div class="nights-badge" id="nightsBadge"></div>
+            <div class="form-row">
+              <div class="field">
+                <label>Your Name</label>
+                <input type="text" id="guestName" placeholder="Full name" />
+              </div>
+              <div class="field">
+                <label>Phone / WhatsApp</label>
+                <input type="tel" id="guestPhone" placeholder="+91 XXXXX XXXXX" />
+              </div>
+              <button class="btn btn-primary" onclick="submitBooking()">Request Booking</button>
+            </div>
+            <p class="checkin-note">&#9432; Check-in from 2:00 PM &nbsp;·&nbsp; Check-out by 12:00 PM noon &nbsp;·&nbsp; We will confirm your booking on WhatsApp.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <section>
       <div class="container">
         <div class="section-title">
@@ -534,44 +578,6 @@
       </div>
     </section>
 
-    <section id="booking">
-      <div class="container">
-        <div class="booking-box">
-          <h2>Check Availability</h2>
-          <p class="sub">Select your check-in and check-out dates to see if Upper Crest is available for your stay.</p>
-
-          <div class="date-row">
-            <div class="field">
-              <label>Check-in Date</label>
-              <input type="text" id="checkin" placeholder="Select date" readonly />
-            </div>
-            <div class="field">
-              <label>Check-out Date</label>
-              <input type="text" id="checkout" placeholder="Select date" readonly />
-            </div>
-            <button class="btn btn-primary" id="checkBtn" onclick="checkAvailability()">Check</button>
-          </div>
-
-          <div class="avail-result" id="availResult"></div>
-
-          <div class="guest-form" id="guestForm">
-            <div class="nights-badge" id="nightsBadge"></div>
-            <div class="form-row">
-              <div class="field">
-                <label>Your Name</label>
-                <input type="text" id="guestName" placeholder="Full name" />
-              </div>
-              <div class="field">
-                <label>Phone / WhatsApp</label>
-                <input type="tel" id="guestPhone" placeholder="+91 XXXXX XXXXX" />
-              </div>
-            </div>
-            <button class="btn btn-primary" style="width:100%;padding:14px" onclick="submitBooking()">Request Booking via WhatsApp</button>
-            <p class="checkin-note">&#9432; Check-in from 2:00 PM &nbsp;|&nbsp; Check-out by 12:00 PM noon &nbsp;|&nbsp; We will confirm your booking on WhatsApp.</p>
-          </div>
-        </div>
-      </div>
-    </section>
   </main>
 
   <footer>

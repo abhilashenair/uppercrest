@@ -95,7 +95,25 @@
     .faq{max-width:900px;margin:auto;display:grid;gap:14px}details{background:var(--white);border:1px solid var(--border);border-radius:18px;padding:18px 22px}summary{cursor:pointer;color:var(--dark);font-size:17px;font-weight:900}details p{margin-top:12px;color:var(--muted)}
     footer{background:var(--dark);color:rgba(255,255,255,.78);text-align:center;padding:34px 0;font-size:14px}
     @media(max-width:980px){.hero-grid,.grid-3,.feature-grid,.stay-types,.cta{grid-template-columns:1fr}.distance-grid,.nearby-grid{grid-template-columns:repeat(2,1fr)}.nav-links{display:none}.feature-list{columns:1}}
-    @media(max-width:620px){.topbar{display:none}.hero{padding:64px 0 48px}section{padding:60px 0}.distance-grid,.nearby-grid{grid-template-columns:1fr}.nearby-item{align-items:flex-start;flex-direction:column}.cta{padding:36px 24px}.btn{font-size:13px;padding:8px 14px}.nav{min-height:60px}.nav .btn-primary{background:none;box-shadow:none;color:var(--brown);border:1.5px solid var(--brown);padding:6px 12px}}
+    @media(max-width:620px){
+      .topbar{display:none}
+      .hero{padding:64px 0 48px}
+      section{padding:60px 0}
+      .distance-grid,.nearby-grid{grid-template-columns:1fr}
+      .nearby-item{align-items:flex-start;flex-direction:column}
+      .cta{padding:36px 24px}
+      .btn{font-size:13px;padding:8px 14px}
+      .nav{min-height:60px}
+      .nav-check-btn{display:none}
+      .nav .btn-primary{font-size:12px;padding:7px 12px}
+      .urgency-bar{font-size:12px;padding:9px 12px}
+      .urgency-bar span{display:none}
+      .price-amount{font-size:34px}
+      .reviews-grid{grid-template-columns:1fr}
+      .pricing-wrap{grid-template-columns:1fr !important;max-width:100% !important}
+      .wa-questions{gap:8px}
+      .wa-q{font-size:12px;padding:8px 12px}
+    }
 
 
     .logo{
@@ -260,7 +278,7 @@
   .price-features li{font-size:14px;font-weight:700;color:var(--text);padding-left:20px;position:relative}
   .price-features li:before{content:"✓";position:absolute;left:0;color:var(--green);font-weight:900}
   .price-note{font-size:12px;color:var(--muted);margin-top:14px;text-align:center}
-  @media(max-width:768px){.pricing-wrap{grid-template-columns:1fr}}
+  @media(max-width:580px){.pricing-wrap{grid-template-columns:1fr !important;max-width:100% !important}}
 
   /* ── Urgency Banner ── */
   .urgency-bar{background:linear-gradient(135deg,#7c2d12,#b45309);color:#fff;padding:12px 0;text-align:center;font-size:14px;font-weight:800;letter-spacing:.2px}
@@ -473,7 +491,7 @@
         <a href="#faq">FAQ</a>
       </nav>
       <div style="display:flex;gap:10px;align-items:center">
-        <button class="btn btn-light" onclick="openPanel()" style="padding:8px 16px">&#128197; Check Availability</button>
+        <button class="btn btn-light nav-check-btn" onclick="openPanel()" style="padding:8px 16px">&#128197; Check Availability</button>
         <a class="btn btn-primary" href="tel:+919292025275">&#128222; Call +91 92920 25275</a>
       </div>
     </div>

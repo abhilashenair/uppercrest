@@ -111,6 +111,39 @@
     }
 }
 
+/* Floating Check Availability Button */
+.float-book{
+  position:fixed;
+  left:0;
+  top:50%;
+  transform:translateY(-50%);
+  z-index:9998;
+}
+.float-book-btn{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:linear-gradient(135deg,var(--brown),var(--gold));
+  color:#fff;
+  font-weight:800;
+  font-size:14px;
+  padding:13px 18px 13px 14px;
+  border-radius:0 14px 14px 0;
+  box-shadow:4px 4px 20px rgba(111,78,55,.35);
+  cursor:pointer;
+  border:none;
+  text-decoration:none;
+  white-space:nowrap;
+  transition:transform .25s ease, box-shadow .25s ease;
+  writing-mode:horizontal-tb;
+}
+.float-book-btn:hover{transform:translateX(4px);box-shadow:6px 6px 28px rgba(111,78,55,.45)}
+.float-book-btn svg{width:20px;height:20px;flex-shrink:0}
+@media(max-width:620px){
+  .float-book-btn{font-size:13px;padding:11px 14px 11px 10px;gap:8px}
+  .float-book-btn svg{width:18px;height:18px}
+}
+
 /* Floating WhatsApp Button */
 .wa-float{
   position:fixed;
@@ -613,6 +646,16 @@
       </div>
     </div>
   </footer>
+
+  <!-- Floating Check Availability Button -->
+  <div class="float-book">
+    <a class="float-book-btn" href="#booking" onclick="document.getElementById('checkin').focus()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+      Check Availability
+    </a>
+  </div>
 
   <!-- Floating WhatsApp Button -->
   <div class="wa-float" id="waFloat">

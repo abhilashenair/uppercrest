@@ -55,6 +55,9 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
 
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
   <!-- ═══ LLMs.txt hint (AI crawler guidance) ═══ -->
   <meta name="llms" content="Upper Crest is a private premium furnished homestay near Cochin International Airport (COK), located at Near Karakattuchira, Poikattusserry, Aluva, Kerala 683578, India. Phone: +91 92920 25275. 6.5 km from Cochin International Airport. Near Nedumbassery and Athani, Aluva. Amenities include furnished bedroom, attached bathroom, living room, dining area, fully equipped kitchen, AC, washing machine, power backup. Meals on request. Suitable for families, couples, airport stopovers, transit stays, Ayurveda hospital visitors and long-term stays. Nearby: Namaste Ayurveda (50m), Angamaly Railway (5km), Aluva Metro (7km), Rajagiri Medical Center (5km), Little Flower Hospital (5km)." />
 
@@ -95,11 +98,11 @@
     section{padding:82px 0}.section-title{max-width:820px;margin:0 auto 42px;text-align:center}.section-title h2{color:var(--dark);font-size:clamp(30px,4vw,46px);line-height:1.15;letter-spacing:-1px;margin-bottom:14px}.section-title p{color:var(--muted);font-size:18px}
     .light-section{background:var(--white)}.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
     .card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:28px;box-shadow:0 12px 34px rgba(23,19,15,.06)}.light-section .card{background:var(--cream)}
-    .icon{width:48px;height:48px;border-radius:16px;background:rgba(200,155,60,.16);display:grid;place-items:center;font-size:24px;margin-bottom:16px}.card h3{color:var(--dark);font-size:21px;margin-bottom:9px}.card p{color:var(--muted)}
+    .icon{width:48px;height:48px;border-radius:16px;background:rgba(200,155,60,.16);display:grid;place-items:center;font-size:22px;color:var(--brown);margin-bottom:16px}.card h3{color:var(--dark);font-size:21px;margin-bottom:9px}.card p{color:var(--muted)}
     .feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:stretch}.feature-panel{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:34px;box-shadow:var(--shadow)}.feature-panel h3{color:var(--dark);font-size:28px;margin-bottom:18px}
     .feature-list{columns:2;column-gap:24px;list-style:none}.feature-list li{break-inside:avoid;margin-bottom:11px;padding-left:24px;position:relative;font-weight:700;color:var(--text)}.feature-list li:before{content:"✓";position:absolute;left:0;color:var(--green);font-weight:900}
     .distance-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}.distance-card{background:var(--cream);border:1px solid var(--border);border-radius:22px;padding:24px;text-align:center}.distance-card strong{display:block;color:var(--brown);font-size:31px;line-height:1.1;margin-bottom:8px}.distance-card span{color:var(--dark);font-weight:800}
-    .nearby-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.nearby-item{background:var(--white);border:1px solid var(--border);border-radius:18px;padding:18px 20px;display:flex;justify-content:space-between;gap:16px;align-items:center;font-weight:800;color:var(--dark)}.nearby-item span{color:var(--brown);white-space:nowrap}.nearby-category{margin-top:40px}.nearby-cat-title{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;color:var(--brown);margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid var(--border)}.cat-icon{font-size:22px}
+    .nearby-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.nearby-item{background:var(--white);border:1px solid var(--border);border-radius:18px;padding:18px 20px;display:flex;justify-content:space-between;gap:16px;align-items:center;font-weight:800;color:var(--dark)}.nearby-item span{color:var(--brown);white-space:nowrap}.nearby-category{margin-top:40px}.nearby-cat-title{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;color:var(--brown);margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid var(--border)}.cat-icon{font-size:18px;width:28px;text-align:center;color:var(--gold)}
     .stay-types{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}.stay-card{border-radius:var(--radius);overflow:hidden;background:var(--white);box-shadow:0 12px 34px rgba(23,19,15,.08);border:1px solid var(--border)}.stay-img{min-height:190px;width:100%;object-fit:cover;display:block}.stay-content{padding:24px}.stay-content h3{color:var(--dark);font-size:22px;margin-bottom:8px}.stay-content p{color:var(--muted)}
     .cta{background:linear-gradient(135deg,rgba(23,19,15,.92),rgba(111,78,55,.92));color:var(--white);border-radius:36px;padding:58px;display:grid;grid-template-columns:1fr auto;gap:26px;align-items:center;box-shadow:var(--shadow)}
     .cta h2{font-size:clamp(30px,4vw,48px);line-height:1.15;margin-bottom:12px}.cta p{color:rgba(255,255,255,.86);font-size:18px;max-width:720px}
@@ -633,9 +636,9 @@
           <p>Enjoy the privacy of a home, the comfort of a furnished apartment and the convenience of being close to the airport, railway stations, metro connectivity, hospitals and key local destinations.</p>
         </div>
         <div class="grid-3">
-          <div class="card"><div class="icon">🏡</div><h3>For Families</h3><p>Spacious living areas, modern amenities and kitchen convenience make Upper Crest ideal for family stays.</p></div>
-          <div class="card"><div class="icon">✈️</div><h3>For Airport Stayovers</h3><p>Located just 6.5 km from Cochin Airport, making it perfect for transit travellers and early flights.</p></div>
-          <div class="card"><div class="icon">🌿</div><h3>For Ayurveda Visitors</h3><p>Located near Namaste Ayurveda and convenient for wellness travellers seeking a peaceful stay.</p></div>
+          <div class="card"><div class="icon"><i class="fa-solid fa-house-chimney"></i></div><h3>For Families</h3><p>Spacious living areas, modern amenities and kitchen convenience make Upper Crest ideal for family stays.</p></div>
+          <div class="card"><div class="icon"><i class="fa-solid fa-plane-departure"></i></div><h3>For Airport Stayovers</h3><p>Located just 6.5 km from Cochin Airport, making it perfect for transit travellers and early flights.</p></div>
+          <div class="card"><div class="icon"><i class="fa-solid fa-leaf"></i></div><h3>For Ayurveda Visitors</h3><p>Located near Namaste Ayurveda and convenient for wellness travellers seeking a peaceful stay.</p></div>
         </div>
       </div>
     </section>
@@ -671,7 +674,7 @@
         </div>
 
         <div class="nearby-category" style="margin-top:0">
-          <h3 class="nearby-cat-title"><span class="cat-icon">✈️</span> Transport &amp; Connectivity</h3>
+          <h3 class="nearby-cat-title"><i class="cat-icon fa-solid fa-plane"></i> Transport &amp; Connectivity</h3>
           <div class="nearby-grid">
             <div class="nearby-item">Cochin International Airport (COK) <span>6.5 KM</span></div>
             <div class="nearby-item">Angamaly Railway Station <span>5 KM</span></div>
@@ -682,7 +685,7 @@
         </div>
 
         <div class="nearby-category">
-          <h3 class="nearby-cat-title"><span class="cat-icon">🛕</span> Pilgrimages &amp; Spiritual Places</h3>
+          <h3 class="nearby-cat-title"><i class="cat-icon fa-solid fa-place-of-worship"></i> Pilgrimages &amp; Spiritual Places</h3>
           <div class="nearby-grid">
             <div class="nearby-item">Aluva Shiva Temple <span>6 KM</span></div>
             <div class="nearby-item">Kaladi Shankaracharya Temple <span>5 KM</span></div>
@@ -700,7 +703,7 @@
         </div>
 
         <div class="nearby-category">
-          <h3 class="nearby-cat-title"><span class="cat-icon">🏖️</span> Tourist Destinations &amp; Nature</h3>
+          <h3 class="nearby-cat-title"><i class="cat-icon fa-solid fa-umbrella-beach"></i> Tourist Destinations &amp; Nature</h3>
           <div class="nearby-grid">
             <div class="nearby-item">Cherai Beach <span>24 KM</span></div>
             <div class="nearby-item">Athirapally Waterfalls <span>33.5 KM</span></div>
@@ -711,7 +714,7 @@
         </div>
 
         <div class="nearby-category">
-          <h3 class="nearby-cat-title"><span class="cat-icon">🏙️</span> City Landmarks &amp; Heritage</h3>
+          <h3 class="nearby-cat-title"><i class="cat-icon fa-solid fa-landmark"></i> City Landmarks &amp; Heritage</h3>
           <div class="nearby-grid">
             <div class="nearby-item">Wellington Island <span>21.5 KM</span></div>
             <div class="nearby-item">Kochi Marine Drive <span>32 KM</span></div>
@@ -722,14 +725,14 @@
         </div>
 
         <div class="nearby-category">
-          <h3 class="nearby-cat-title"><span class="cat-icon">🛍️</span> Shopping &amp; Entertainment</h3>
+          <h3 class="nearby-cat-title"><i class="cat-icon fa-solid fa-bag-shopping"></i> Shopping &amp; Entertainment</h3>
           <div class="nearby-grid">
             <div class="nearby-item">LuLu Mall Kochi <span>19 KM</span></div>
           </div>
         </div>
 
         <div class="nearby-category">
-          <h3 class="nearby-cat-title"><span class="cat-icon">🏥</span> Hospitals &amp; Healthcare</h3>
+          <h3 class="nearby-cat-title"><i class="cat-icon fa-solid fa-hospital"></i> Hospitals &amp; Healthcare</h3>
           <div class="nearby-grid">
             <div class="nearby-item">Namaste Ayurveda <span>50 M</span></div>
             <div class="nearby-item">Rajagiri Medical Center <span>5 KM</span></div>

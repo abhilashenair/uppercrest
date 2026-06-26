@@ -1,0 +1,5 @@
+
+RewriteEngine On
+
+RewriteRule ^calendar\.ics$ calendar.php [L]
+

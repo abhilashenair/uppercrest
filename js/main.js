@@ -1,9 +1,28 @@
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZ0GDPcMmRdq2duuhd6wiW2PjP_A7LpaDXTWrtOJVGKCBMMyp99syPhcQyD2ia1V_QMQ/exec";
+const SUBMIT_URL = "/submit-booking.php";
+const CSV_URL = "https://docs.google.com/spreadsheets/d/1h9MvSrn-GdQD_z4Jw2QJfUHelJSjGukHSCuZcG3QxHA/export?format=csv&gid=0";
 var bookedRanges = [];
 
-fetch(SCRIPT_URL)
-  .then(function(r){return r.json();})
-  .then(function(data){bookedRanges=data.bookedDates||[];initPickers();})
+fetch(CSV_URL)
+  .then(function(r){return r.text();})
+  .then(function(csv){
+    var lines = csv.trim().split("\n");
+    lines.shift();
+    lines.forEach(function(line){
+      var cols = line.split(",");
+      if(cols.length < 6) return;
+      var status = cols[5].replace(/"/g,"").trim().toLowerCase();
+      if(status !== "confirmed") return;
+      var ciParts = cols[3].replace(/"/g,"").trim().split("-");
+      var coParts = cols[4].replace(/"/g,"").trim().split("-");
+      if(ciParts.length===3 && coParts.length===3){
+        bookedRanges.push({
+          check_in:  ciParts[2]+"-"+ciParts[1]+"-"+ciParts[0],
+          check_out: coParts[2]+"-"+coParts[1]+"-"+coParts[0]
+        });
+      }
+    });
+    initPickers();
+  })
   .catch(function(){initPickers();});
 
 function initPickers(){
@@ -59,8 +78,8 @@ function submitBooking(){
   var ci=document.getElementById("checkin").value,co=document.getElementById("checkout").value;
   if(!name||!phone){alert("Please enter your name and phone number.");return;}
   var nights=Math.round((new Date(co)-new Date(ci))/(1000*60*60*24));
-  fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify({name:name,phone:phone,check_in:ci,check_out:co})}).catch(function(){});
-  var msg=encodeURIComponent("ðŸ¡ *New Booking Request â€” Upper Crest*\n\nðŸ‘¤ Name: "+name+"\nðŸ“ž Phone: "+phone+"\nðŸ“… Check-in: "+formatDate(ci)+" (2:00 PM)\nðŸ“… Check-out: "+formatDate(co)+" (12:00 PM)\nðŸŒ™ Nights: "+nights+"\n\nPlease confirm this booking.");
+  fetch(SUBMIT_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:name,phone:phone,check_in:ci,check_out:co})}).catch(function(){});
+  var msg=encodeURIComponent("í ¼í¿¡ *New Booking Request â€” Upper Crest*\n\ní ½í±¤ Name: "+name+"\ní ½í³ž Phone: "+phone+"\ní ½í³… Check-in: "+formatDate(ci)+" (2:00 PM)\ní ½í³… Check-out: "+formatDate(co)+" (12:00 PM)\ní ¼í¼™ Nights: "+nights+"\n\nPlease confirm this booking.");
   window.open("https://wa.me/919292025275?text="+msg,"_blank");
 }
 function formatDate(s){return new Date(s).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"});}

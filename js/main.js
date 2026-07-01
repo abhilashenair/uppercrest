@@ -3,8 +3,41 @@ var bookedRanges = [];
 
 fetch(SCRIPT_URL)
   .then(function(r){return r.json();})
-  .then(function(data){bookedRanges=data.bookedDates||[];initPickers();})
+  .then(function(data){
+    var rows=data.bookedDates||data.bookings||[];
+    bookedRanges=normalizeBookings(rows,!!data.bookedDates&&!data.bookings);
+    initPickers();
+  })
   .catch(function(){initPickers();});
+
+function normalizeBookings(rows,assumeConfirmed){
+  return rows.map(function(row){
+    var status=String(getValue(row,["status","Status","booking_status","Booking Status"])||"").trim().toLowerCase();
+    if(!status&&assumeConfirmed) status="confirmed";
+    var from=getValue(row,["check_in","checkIn","from_date","fromDate","from date","From Date","start_date","startDate"]);
+    var to=getValue(row,["check_out","checkOut","to_date","toDate","to date","To Date","end_date","endDate"]);
+    if(status!=="confirmed") return null;
+    if(!from||!to) return null;
+    return {check_in:toIsoDate(from),check_out:toIsoDate(to),status:status||"confirmed"};
+  }).filter(function(row){return row&&row.check_in&&row.check_out;});
+}
+
+function getValue(row,names){
+  for(var i=0;i<names.length;i++){
+    if(row[names[i]]!==undefined&&row[names[i]]!==null&&row[names[i]]!=="") return row[names[i]];
+  }
+  return "";
+}
+
+function toIsoDate(value){
+  if(value instanceof Date) return value.toISOString().split("T")[0];
+  var s=String(value).trim();
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  var m=s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+  if(m) return m[3]+"-"+String(m[2]).padStart(2,"0")+"-"+String(m[1]).padStart(2,"0");
+  var d=new Date(s);
+  return isNaN(d.getTime())?"":d.toISOString().split("T")[0];
+}
 
 function initPickers(){
   if(typeof flatpickr==='undefined') return;
@@ -59,7 +92,7 @@ function submitBooking(){
   var ci=document.getElementById("checkin").value,co=document.getElementById("checkout").value;
   if(!name||!phone){alert("Please enter your name and phone number.");return;}
   var nights=Math.round((new Date(co)-new Date(ci))/(1000*60*60*24));
-  fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify({name:name,phone:phone,check_in:ci,check_out:co})}).catch(function(){});
+  fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify({name:name,phone:phone,check_in:ci,check_out:co,from_date:ci,to_date:co,status:"Pending"})}).catch(function(){});
   var msg=encodeURIComponent("🏡 *New Booking Request — Upper Crest*\n\n👤 Name: "+name+"\n📞 Phone: "+phone+"\n📅 Check-in: "+formatDate(ci)+" (2:00 PM)\n📅 Check-out: "+formatDate(co)+" (before 11:00 AM)\n🌙 Nights: "+nights+"\n\nPlease confirm this booking.");
   window.open("https://wa.me/919292025275?text="+msg,"_blank");
 }

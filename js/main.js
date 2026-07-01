@@ -92,9 +92,16 @@ function submitBooking(){
   var ci=document.getElementById("checkin").value,co=document.getElementById("checkout").value;
   if(!name||!phone){alert("Please enter your name and phone number.");return;}
   var nights=Math.round((new Date(co)-new Date(ci))/(1000*60*60*24));
-  fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify({name:name,phone:phone,check_in:ci,check_out:co,from_date:formatSheetDate(ci),to_date:formatSheetDate(co),status:"Pending"})}).catch(function(){});
-  var msg=encodeURIComponent("🏡 *New Booking Request — Upper Crest*\n\n👤 Name: "+name+"\n📞 Phone: "+phone+"\n📅 Check-in: "+formatDate(ci)+" (2:00 PM)\n📅 Check-out: "+formatDate(co)+" (before 11:00 AM)\n🌙 Nights: "+nights+"\n\nPlease confirm this booking.");
+  var bookingId=createBookingId();
+  fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify({booking_id:bookingId,name:name,phone:phone,check_in:ci,check_out:co,from_date:formatSheetDate(ci),to_date:formatSheetDate(co),status:"Pending"})}).catch(function(){});
+  var msg=encodeURIComponent("🏡 *New Booking Request — Upper Crest*\n\n🆔 Booking ID: "+bookingId+"\n👤 Name: "+name+"\n📞 Phone: "+phone+"\n📅 Check-in: "+formatDate(ci)+" (2:00 PM)\n📅 Check-out: "+formatDate(co)+" (before 11:00 AM)\n🌙 Nights: "+nights+"\n\nPlease confirm this booking.");
   window.open("https://wa.me/919292025275?text="+msg,"_blank");
+}
+function createBookingId(){
+  var d=new Date();
+  var stamp=d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0")+String(d.getHours()).padStart(2,"0")+String(d.getMinutes()).padStart(2,"0")+String(d.getSeconds()).padStart(2,"0");
+  var random=Math.random().toString(36).slice(2,6).toUpperCase();
+  return "UC-"+stamp+"-"+random;
 }
 function formatSheetDate(s){
   var parts=s.split("-");

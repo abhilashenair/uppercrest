@@ -92,8 +92,12 @@ function submitBooking(){
   var ci=document.getElementById("checkin").value,co=document.getElementById("checkout").value;
   if(!name||!phone){alert("Please enter your name and phone number.");return;}
   var nights=Math.round((new Date(co)-new Date(ci))/(1000*60*60*24));
-  fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify({name:name,phone:phone,check_in:ci,check_out:co,from_date:ci,to_date:co,status:"Pending"})}).catch(function(){});
+  fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify({name:name,phone:phone,check_in:ci,check_out:co,from_date:formatSheetDate(ci),to_date:formatSheetDate(co),status:"Pending"})}).catch(function(){});
   var msg=encodeURIComponent("🏡 *New Booking Request — Upper Crest*\n\n👤 Name: "+name+"\n📞 Phone: "+phone+"\n📅 Check-in: "+formatDate(ci)+" (2:00 PM)\n📅 Check-out: "+formatDate(co)+" (before 11:00 AM)\n🌙 Nights: "+nights+"\n\nPlease confirm this booking.");
   window.open("https://wa.me/919292025275?text="+msg,"_blank");
+}
+function formatSheetDate(s){
+  var parts=s.split("-");
+  return parts.length===3 ? parts[2]+"/"+parts[1]+"/"+parts[0] : s;
 }
 function formatDate(s){return new Date(s).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"});}

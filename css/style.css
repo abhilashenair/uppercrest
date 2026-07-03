@@ -206,25 +206,25 @@ footer{background:var(--dark);color:rgba(255,255,255,.78);padding:52px 0 0;font-
 .page-hero{background:linear-gradient(150deg,#1a1008 0%,#2c1a0e 35%,#3d2410 60%,#2a1508 100%);padding:64px 0 52px;text-align:center}
 .page-hero h1{color:#fff;font-size:clamp(32px,5vw,52px);line-height:1.1;letter-spacing:-1px;margin-bottom:14px}
 .page-hero p{color:rgba(255,255,255,.78);font-size:18px;max-width:640px;margin:0 auto}
-.guest-checkin-page{background:#d9eaff}
-.guest-checkin{padding:54px 0 58px;background:#d9eaff;min-height:calc(100vh - 78px)}
+.guest-checkin-page{background:var(--cream)}
+.guest-checkin{padding:54px 0 58px;background:linear-gradient(180deg,var(--cream),var(--soft));min-height:calc(100vh - 78px)}
 .guest-checkin-title{text-align:center;max-width:760px;margin:0 auto 48px}
-.guest-checkin-title h1{font-family:Georgia,'Times New Roman',serif;color:#2563eb;font-size:clamp(36px,5vw,56px);line-height:1.05;letter-spacing:0;margin-bottom:22px}
-.guest-checkin-title p{color:#334155;font-size:20px;line-height:1.5;font-weight:600}
+.guest-checkin-title h1{font-family:Georgia,'Times New Roman',serif;color:var(--dark);font-size:clamp(36px,5vw,56px);line-height:1.05;letter-spacing:0;margin-bottom:22px}
+.guest-checkin-title p{color:var(--muted);font-size:20px;line-height:1.5;font-weight:600}
 .guest-checkin-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:32px;align-items:stretch}
-.guest-checkin-card{background:#fff;border:2px solid #2563ff;border-radius:14px;box-shadow:0 4px 16px rgba(37,99,235,.14);padding:32px;min-height:488px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.guest-checkin-card{background:var(--white);border:1.5px solid rgba(111,78,55,.24);border-radius:16px;box-shadow:var(--shadow);padding:32px;min-height:488px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .guest-icon-wrap{position:relative;margin-bottom:18px}
-.guest-icon{width:48px;height:48px;background:#2f6df6;color:#fff;border-radius:10px;display:grid;place-items:center;font-size:22px;box-shadow:0 4px 0 #2458d7}
+.guest-icon{width:48px;height:48px;background:linear-gradient(135deg,var(--brown),var(--gold));color:#fff;border-radius:10px;display:grid;place-items:center;font-size:22px;box-shadow:0 4px 0 rgba(111,78,55,.35)}
 .guest-icon-wrap .flower{position:absolute;right:-9px;top:-10px;font-size:16px}
-.guest-checkin-card h2{color:#1d5bea;font-size:20px;line-height:1.3;margin-bottom:20px}
+.guest-checkin-card h2{color:var(--brown);font-size:22px;line-height:1.3;margin-bottom:20px}
 .guest-actions{display:grid;gap:16px;width:min(340px,100%);margin-bottom:26px}
-.guest-form-link{display:flex;align-items:center;justify-content:center;gap:10px;min-height:54px;border-radius:7px;background:#3478f6;color:#fff;font-weight:900;font-size:16px;box-shadow:0 10px 18px rgba(37,99,235,.22);border:2px solid #2563ff;transition:transform .2s ease,box-shadow .2s ease}
-.guest-form-link:hover{transform:translateY(-2px);box-shadow:0 13px 22px rgba(37,99,235,.28)}
-.guest-form-link-dark{background:#172235;color:#2f75ff;box-shadow:0 4px 10px rgba(15,23,42,.18)}
-.guest-note{background:#f1f5f9;border-radius:7px;color:#334155;font-size:15px;line-height:1.5;padding:17px;width:100%;max-width:500px}
+.guest-form-link{display:flex;align-items:center;justify-content:center;gap:10px;min-height:54px;border-radius:8px;background:linear-gradient(135deg,var(--brown),var(--gold));color:#fff;font-weight:900;font-size:16px;box-shadow:0 10px 18px rgba(111,78,55,.2);border:1.5px solid rgba(200,155,60,.55);transition:transform .2s ease,box-shadow .2s ease}
+.guest-form-link:hover{transform:translateY(-2px);box-shadow:0 13px 22px rgba(111,78,55,.26)}
+.guest-form-link-dark{background:var(--dark);color:var(--gold);box-shadow:0 4px 10px rgba(23,19,15,.18);border-color:rgba(200,155,60,.45)}
+.guest-note{background:var(--soft);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:15px;line-height:1.5;padding:17px;width:100%;max-width:500px}
 .guest-note p+p{margin-top:4px}
-.guest-checkin-help{text-align:center;color:#334155;font-size:15px;font-weight:600;margin-top:34px}
-.guest-checkin-help a{color:#1d5bea;font-weight:900}
+.guest-checkin-help{text-align:center;color:var(--muted);font-size:15px;font-weight:600;margin-top:34px}
+.guest-checkin-help a{color:var(--brown);font-weight:900}
 @media(max-width:980px){
   .hero-grid,.grid-3,.feature-grid,.stay-types,.cta,.about-grid,.value-grid,.rules-layout,.guest-checkin-grid{grid-template-columns:1fr}
   .distance-grid,.nearby-grid{grid-template-columns:repeat(2,1fr)}

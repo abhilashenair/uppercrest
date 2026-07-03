@@ -176,6 +176,8 @@ footer{background:var(--dark);color:rgba(255,255,255,.78);padding:52px 0 0;font-
 .price-card.popular{border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,155,60,.18)}
 .price-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--brown),var(--gold));color:#fff;font-size:12px;font-weight:900;padding:4px 14px;border-radius:999px;white-space:nowrap}
 .price-label{font-size:13px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.price-old{display:inline-block;color:var(--muted);font-size:20px;font-weight:900;line-height:1;text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:rgba(185,48,48,.7);margin-bottom:8px}
+.price-old sup{font-size:12px;vertical-align:super}
 .price-amount{font-size:42px;font-weight:900;color:var(--dark);line-height:1;letter-spacing:-1px}
 .price-amount sup{font-size:20px;vertical-align:super;letter-spacing:0}
 .price-per{font-size:14px;color:var(--muted);font-weight:700;margin-bottom:16px}

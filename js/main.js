@@ -1,5 +1,7 @@
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZ0GDPcMmRdq2duuhd6wiW2PjP_A7LpaDXTWrtOJVGKCBMMyp99syPhcQyD2ia1V_QMQ/exec";
 var bookedRanges = [];
+var currentBookingId = "";
+var currentBookingKey = "";
 
 fetch(SCRIPT_URL)
   .then(function(r){return r.json();})
@@ -75,6 +77,8 @@ function checkAvailability(){
   var ciD=new Date(ci),coD=new Date(co),nights=Math.round((coD-ciD)/(1000*60*60*24));
   var avail=!bookedRanges.some(function(r){return ciD<new Date(r.check_out)&&coD>new Date(r.check_in);});
   if(avail){
+    var bookingId=getBookingId(ci,co);
+    saveBookingEnquiry({booking_id:bookingId,name:"",phone:"",check_in:ci,check_out:co,status:"Pending"});
     res.className="panel-result available";
     res.innerHTML="&#10003; Available! "+nights+" night"+(nights>1?"s":"")+" from "+formatDate(ci)+" to "+formatDate(co)+". Fill in your details below to request a booking.";
     res.style.display="block";
@@ -92,10 +96,33 @@ function submitBooking(){
   var ci=document.getElementById("checkin").value,co=document.getElementById("checkout").value;
   if(!name||!phone){alert("Please enter your name and phone number.");return;}
   var nights=Math.round((new Date(co)-new Date(ci))/(1000*60*60*24));
-  var bookingId=createBookingId();
-  fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify({booking_id:bookingId,name:name,phone:phone,check_in:ci,check_out:co,from_date:formatSheetDate(ci),to_date:formatSheetDate(co),status:"Pending"})}).catch(function(){});
+  var bookingId=getBookingId(ci,co);
+  saveBookingEnquiry({booking_id:bookingId,name:name,phone:phone,check_in:ci,check_out:co,status:"Pending"});
   var msg=encodeURIComponent("🏡 *New Booking Request — Upper Crest*\n\n🆔 Booking ID: "+bookingId+"\n👤 Name: "+name+"\n📞 Phone: "+phone+"\n📅 Check-in: "+formatDate(ci)+" (2:00 PM)\n📅 Check-out: "+formatDate(co)+" (before 11:00 AM)\n🌙 Nights: "+nights+"\n\nPlease confirm this booking.");
   window.open("https://wa.me/919292025275?text="+msg,"_blank");
+}
+function getBookingId(ci,co){
+  var key=ci+"|"+co;
+  if(!currentBookingId||currentBookingKey!==key){
+    currentBookingId=createBookingId();
+    currentBookingKey=key;
+  }
+  return currentBookingId;
+}
+function saveBookingEnquiry(data){
+  fetch(SCRIPT_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      booking_id:data.booking_id,
+      name:data.name,
+      phone:data.phone,
+      check_in:data.check_in,
+      check_out:data.check_out,
+      from_date:formatSheetDate(data.check_in),
+      to_date:formatSheetDate(data.check_out),
+      status:data.status||"Pending"
+    })
+  }).catch(function(){});
 }
 function createBookingId(){
   var d=new Date();

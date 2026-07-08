@@ -9,7 +9,7 @@
 
   var wafloat = '<div class="panel-overlay" id="panelOverlay" onclick="closePanel()"></div><div class="booking-panel" id="bookingPanel"><div class="panel-header"><h3><i class="fa-regular fa-calendar" style="margin-right:8px"></i>Check Availability</h3><button class="panel-close" onclick="closePanel()">&#10005;</button></div><div class="panel-body"><div class="panel-field"><label>Check-in Date</label><input type="text" id="checkin" placeholder="Select date" readonly /></div><div class="panel-field"><label>Check-out Date</label><input type="text" id="checkout" placeholder="Select date" readonly /></div><button class="btn btn-primary" style="width:100%;padding:14px;border-radius:14px;font-size:15px" onclick="checkAvailability()">Check Availability</button><div class="panel-result" id="availResult"></div><div class="panel-guest" id="guestForm"><div class="panel-nights" id="nightsBadge"></div><div class="panel-field"><label>Your Name</label><input type="text" id="guestName" placeholder="Full name" /></div><div class="panel-field"><label>Phone / WhatsApp</label><input type="tel" id="guestPhone" placeholder="+91 XXXXX XXXXX" /></div><button class="btn btn-primary" style="width:100%;padding:14px;border-radius:14px;font-size:15px" onclick="submitBooking()">Request Booking via WhatsApp</button><p class="panel-note">&#9432; Check-in from 2:00 PM &nbsp;·&nbsp; Check-out before 11:00 AM<br>We will confirm your booking on WhatsApp.</p></div></div></div><div class="wa-float" id="waFloat"><button class="cal-btn" onclick="openPanel()" aria-label="Check Availability"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" stroke="#fff"/><line x1="16" y1="2" x2="16" y2="6" stroke="#fff"/><line x1="8" y1="2" x2="8" y2="6" stroke="#fff"/><line x1="3" y1="10" x2="21" y2="10" stroke="#fff"/></svg></button><div class="wa-bubble" id="waBubble"><button class="wa-close" onclick="document.getElementById(\'waBubble\').style.display=\'none\'" aria-label="Close">&#10005;</button><strong style="display:block;margin-bottom:6px;color:var(--dark)"><i class="fa-brands fa-whatsapp" style="margin-right:6px;color:#25d366"></i>How can I help you?</strong>Looking for a stay near Kochi Airport?<br>Chat with us on WhatsApp!</div><a class="wa-btn" href="https://wa.me/919292025275?text=Hi%2C%20I%20am%20interested%20in%20booking%20Upper%20Crest%20Homestay%20near%20Kochi%20Airport." target="_blank" rel="noopener" aria-label="Chat on WhatsApp"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#25d366"/><path d="M23.5 8.5A10.43 10.43 0 0 0 16 5.5C10.75 5.5 6.5 9.75 6.5 15a9.44 9.44 0 0 0 1.35 4.92L6.5 26.5l6.77-1.33A9.5 9.5 0 0 0 16 25.5c5.25 0 9.5-4.25 9.5-9.5a9.43 9.43 0 0 0-2-6Z" fill="#fff"/><path d="M21.6 18.4c-.28-.14-1.64-.81-1.9-.9-.26-.09-.44-.14-.63.14-.18.28-.72.9-.88 1.08-.16.18-.33.2-.6.07-.28-.14-1.18-.44-2.24-1.39-.83-.74-1.38-1.65-1.55-1.93-.16-.28-.02-.43.12-.57.13-.12.28-.32.42-.48.14-.16.18-.28.28-.46.09-.18.05-.34-.02-.48-.07-.14-.63-1.52-.87-2.08-.23-.54-.46-.47-.63-.48-.16-.01-.35-.01-.54-.01-.18 0-.48.07-.73.34-.25.28-.97.95-.97 2.3s.99 2.67 1.13 2.86c.14.18 1.95 2.97 4.72 4.16.66.28 1.18.45 1.58.57.66.21 1.26.18 1.74.11.53-.08 1.64-.67 1.87-1.32.23-.65.23-1.2.16-1.32-.07-.11-.25-.18-.53-.32Z" fill="#25d366"/></svg></a></div>';
 
-  var lb = '<div id="lb-overlay" role="dialog" aria-modal="true"><button id="lb-close" aria-label="Close">&times;</button><img id="lb-img" src="" alt=""></div>';
+  var lb = '<div id="lb-overlay" role="dialog" aria-modal="true"><button id="lb-close" aria-label="Close">&times;</button><button id="lb-prev" class="lb-nav" aria-label="Previous image">&#10094;</button><img id="lb-img" src="" alt=""><button id="lb-next" class="lb-nav" aria-label="Next image">&#10095;</button><div id="lb-count" aria-live="polite"></div></div>';
 
   var checkinFloat = '<a class="checkin-float" href="guest-checkin.html" aria-label="Guest Check-in"><i class="fa-solid fa-clipboard-check"></i><span>Guest Check-in</span></a>';
 
@@ -32,19 +32,41 @@
     }, 8000);
 
     // Lightbox
-    var overlay=document.getElementById('lb-overlay'),lbImg=document.getElementById('lb-img'),lbClose=document.getElementById('lb-close');
+    var overlay=document.getElementById('lb-overlay'),lbImg=document.getElementById('lb-img'),lbClose=document.getElementById('lb-close'),lbPrev=document.getElementById('lb-prev'),lbNext=document.getElementById('lb-next'),lbCount=document.getElementById('lb-count');
     if(overlay){
-      document.querySelectorAll('.gallery-grid a').forEach(function(a){
+      var galleryItems=Array.prototype.slice.call(document.querySelectorAll('.gallery-grid a'));
+      var currentIndex=0;
+
+      function showImage(index){
+        if(!galleryItems.length) return;
+        currentIndex=(index+galleryItems.length)%galleryItems.length;
+        var item=galleryItems[currentIndex];
+        var img=item.querySelector('img');
+        lbImg.src=item.href;
+        lbImg.alt=img ? img.alt : '';
+        lbCount.textContent=(currentIndex+1)+' / '+galleryItems.length;
+      }
+
+      galleryItems.forEach(function(a,index){
         a.addEventListener('click',function(e){
           e.preventDefault();
-          lbImg.src=a.href;lbImg.alt=a.querySelector('img').alt;
+          showImage(index);
           overlay.classList.add('open');document.body.style.overflow='hidden';
         });
       });
       function closeLb(){overlay.classList.remove('open');lbImg.src='';document.body.style.overflow='';}
+      function prevImage(){showImage(currentIndex-1);}
+      function nextImage(){showImage(currentIndex+1);}
       lbClose.addEventListener('click',closeLb);
+      lbPrev.addEventListener('click',function(e){e.stopPropagation();prevImage();});
+      lbNext.addEventListener('click',function(e){e.stopPropagation();nextImage();});
       overlay.addEventListener('click',function(e){if(e.target===overlay)closeLb();});
-      document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLb();});
+      document.addEventListener('keydown',function(e){
+        if(!overlay.classList.contains('open')) return;
+        if(e.key==='Escape') closeLb();
+        if(e.key==='ArrowLeft') prevImage();
+        if(e.key==='ArrowRight') nextImage();
+      });
     }
   });
 })();

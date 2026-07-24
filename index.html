@@ -32,7 +32,7 @@
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-7STCW44646');</script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" />
-  <link rel="stylesheet" href="css/style.css?v=20260724-reviews">
+  <link rel="stylesheet" href="css/style.css?v=20260724-google-design">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"LodgingBusiness","@id":"https://theuppercrest.in/#lodging","name":"Upper Crest Homestay","description":"Premium furnished homestay near Cochin International Airport, Aluva Kerala.","url":"https://theuppercrest.in/","telephone":"+919292025275","address":{"@type":"PostalAddress","streetAddress":"Near Karakattuchira, Poikattusserry","addressLocality":"Aluva","addressRegion":"Kerala","postalCode":"683578","addressCountry":"IN"},"geo":{"@type":"GeoCoordinates","latitude":10.1004,"longitude":76.3569},"image":"https://theuppercrest.in/images/exterior-front-view.png","priceRange":"₹₹","checkinTime":"14:00","checkoutTime":"11:00","sameAs":["https://wa.me/919292025275"]}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Is Upper Crest a homestay near Kochi Airport?","acceptedAnswer":{"@type":"Answer","text":"Yes. Upper Crest is located about 6.5 km from Cochin International Airport, making it ideal for airport stayovers, families, married couples and travellers."}},{"@type":"Question","name":"How far is Upper Crest from Cochin International Airport?","acceptedAnswer":{"@type":"Answer","text":"Upper Crest Homestay is approximately 6.5 km from Cochin International Airport (COK)."}}]}</script>
 </head>
@@ -174,12 +174,18 @@
 
     <section id="reviews">
       <div class="container">
-        <div class="section-title">
-          <div class="google-review-badge"><span class="google-logo-mark">G</span><span id="googleReviewSummary">Google Reviews</span></div>
-          <h2>Guests Love Staying Here</h2>
-          <p>Recent 5-star guest reviews from Google.</p>
+        <div class="reviews-heading">
+          <h2>Google Reviews</h2>
+          <p>Read recent guest feedback from our Google Business Profile and book your stay with confidence.</p>
         </div>
-        <div class="reviews-grid" id="googleReviewsGrid">
+        <div class="google-rating-panel">
+          <div>
+            <div class="google-rating-title"><span class="google-wordmark"><span>G</span><span>o</span><span>o</span><span>g</span><span>l</span><span>e</span></span> Rating</div>
+            <div class="google-rating-row"><strong id="googleRatingValue">5.0</strong><span class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span id="googleReviewSummary">Google Reviews</span></div>
+          </div>
+          <a id="googleWriteReviewLink" class="btn btn-primary google-write-btn" href="https://www.google.com/search?q=The+Upper+Crest+Poikattusserry" target="_blank" rel="noopener">Write A Review</a>
+        </div>
+        <div class="reviews-grid google-review-grid" id="googleReviewsGrid">
           <div class="review-card review-loading"><div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p class="review-text">Loading latest Google reviews...</p><div class="review-author"><div class="review-avatar">G</div><div><div class="review-name">Google Reviews</div><div class="review-meta">Fetching live guest feedback</div></div></div></div>
         </div>
         <div class="google-review-footer"><a id="googleReviewsLink" class="google-badge" href="https://www.google.com/search?q=The+Upper+Crest+Poikattusserry" target="_blank" rel="noopener"><span class="google-logo-mark">G</span> View on Google</a></div>
@@ -198,6 +204,6 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
-  <script src="js/main.js?v=20260724-reviews" defer></script>
+  <script src="js/main.js?v=20260724-google-design" defer></script>
 </body>
 </html>

@@ -135,3 +135,54 @@ function formatSheetDate(s){
   return parts.length===3 ? parts[2]+"/"+parts[1]+"/"+parts[0] : s;
 }
 function formatDate(s){return new Date(s).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"});}
+
+loadGoogleReviews();
+
+function loadGoogleReviews(){
+  var grid=document.getElementById("googleReviewsGrid");
+  if(!grid) return;
+  fetch("google-reviews.php")
+    .then(function(r){return r.json();})
+    .then(function(data){
+      if(!data.ok) throw new Error(data.error||"Google reviews unavailable");
+      renderGoogleReviews(data);
+    })
+    .catch(function(){
+      grid.innerHTML='<div class="review-card"><div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p class="review-text">Google reviews are currently available on our Google Business Profile.</p><div class="review-author"><div class="review-avatar">G</div><div><div class="review-name">The Upper Crest</div><div class="review-meta">Google Reviews</div></div></div></div>';
+    });
+}
+
+function renderGoogleReviews(data){
+  var grid=document.getElementById("googleReviewsGrid");
+  var summary=document.getElementById("googleReviewSummary");
+  var link=document.getElementById("googleReviewsLink");
+  var reviews=(data.reviews||[]).filter(function(review){return Number(review.rating)===5;}).slice(0,3);
+  if(link&&data.googleMapsUrl) link.href=data.googleMapsUrl;
+  if(summary){
+    var count=data.userRatingCount ? " · "+data.userRatingCount+" reviews" : "";
+    summary.textContent=(data.rating ? data.rating+" · " : "")+"Google Reviews"+count;
+  }
+  if(!reviews.length){
+    grid.innerHTML='<div class="review-card"><div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p class="review-text">Visit our Google Business Profile to read guest reviews for The Upper Crest.</p><div class="review-author"><div class="review-avatar">G</div><div><div class="review-name">The Upper Crest</div><div class="review-meta">Google Reviews</div></div></div></div>';
+    return;
+  }
+  grid.innerHTML=reviews.map(function(review){
+    var name=escapeHtml(review.author_name||"Google reviewer");
+    var initial=escapeHtml(name.charAt(0).toUpperCase()||"G");
+    var time=escapeHtml(review.relative_time_description||"Google Review");
+    var text=escapeHtml(review.text||"Rated 5 stars on Google.");
+    var authorUrl=review.author_url ? String(review.author_url) : "";
+    var nameHtml=authorUrl ? '<a href="'+escapeAttribute(authorUrl)+'" target="_blank" rel="noopener">'+name+'</a>' : name;
+    return '<div class="review-card"><div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p class="review-text">"'+text+'"</p><div class="review-author"><div class="review-avatar">'+initial+'</div><div><div class="review-name">'+nameHtml+'</div><div class="review-meta">'+time+' &nbsp;·&nbsp; Google Review</div></div></div></div>';
+  }).join("");
+}
+
+function escapeHtml(value){
+  return String(value).replace(/[&<>"']/g,function(ch){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[ch];
+  });
+}
+
+function escapeAttribute(value){
+  return escapeHtml(value).replace(/`/g,"&#96;");
+}

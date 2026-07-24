@@ -1,5 +1,5 @@
 <?php
-$SHEET_URL = "https://script.google.com/macros/s/AKfycbxZ0GDPcMmRdq2duuhd6wiW2PjP_A7LpaDXTWrtOJVGKCBMMyp99syPhcQyD2ia1V_QMQ/exec";
+$SHEET_URL = "https://script.google.com/macros/s/AKfycbzdDSIiV0JSlgVx2ymb39saPoIulAKRJay5QQYvVCrG7mKUK2us5pJI6_D5YfPd9LQP/exec";
 $response = @file_get_contents($SHEET_URL);
 $data = json_decode($response, true);
 $bookings = isset($data['bookedDates']) ? $data['bookedDates'] : [];

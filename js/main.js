@@ -1,4 +1,4 @@
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZ0GDPcMmRdq2duuhd6wiW2PjP_A7LpaDXTWrtOJVGKCBMMyp99syPhcQyD2ia1V_QMQ/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzdDSIiV0JSlgVx2ymb39saPoIulAKRJay5QQYvVCrG7mKUK2us5pJI6_D5YfPd9LQP/exec";
 var bookedRanges = [];
 var currentBookingId = "";
 var currentBookingKey = "";

@@ -207,9 +207,9 @@ footer{background:var(--dark);color:rgba(255,255,255,.78);padding:52px 0 0;font-
 .google-write-btn{border-radius:3px;padding:12px 22px;white-space:nowrap}
 .reviews-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
 .google-review-grid{gap:22px;margin-top:20px}
-.review-card{background:#f4f4f4;border:1px solid #ebe7df;border-radius:4px;padding:26px 28px;box-shadow:0 6px 18px rgba(23,19,15,.05);min-height:300px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.review-card{background:#f4f4f4;border:1px solid #ebe7df;border-radius:4px;padding:26px 28px;box-shadow:0 6px 18px rgba(23,19,15,.05);min-height:360px;display:flex;flex-direction:column;align-items:center;text-align:center}
 .review-stars{color:#fbbc05;font-size:18px;margin-bottom:12px;letter-spacing:1px}
-.review-text{color:#111;font-size:14px;line-height:1.45;margin-bottom:16px}
+.review-text{color:#111;font-size:14px;line-height:1.45;margin-bottom:16px;min-height:122px;max-height:122px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical}
 .review-more{color:#969087;font-size:14px;margin:-8px 0 14px}
 .review-author{display:flex;align-items:center;gap:12px}
 .google-review-grid .review-author{flex-direction:column;gap:8px;margin-top:auto}
@@ -310,6 +310,7 @@ footer{background:var(--dark);color:rgba(255,255,255,.78);padding:52px 0 0;font-
   .distance-card{padding:18px 12px}
   .distance-card strong{font-size:24px}
   .review-card{padding:20px}
+  .review-text{min-height:auto;max-height:none;-webkit-line-clamp:unset}
   .price-card{padding:24px 18px}
   .panel-body{padding:18px}
   details{padding:14px 18px}

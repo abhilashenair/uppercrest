@@ -101,10 +101,16 @@ function booking_get_inventory($from, $to) {
     return $rows;
 }
 
-function booking_confirmed_overlaps($checkIn, $checkOut) {
+function booking_confirmed_overlaps($checkIn, $checkOut, $excludeBookingId = '') {
     $pdo = booking_pdo();
-    $stmt = $pdo->prepare("SELECT * FROM booking_reservations WHERE status = 'confirmed' AND check_in < ? AND check_out > ? ORDER BY check_in");
-    $stmt->execute(array($checkOut, $checkIn));
+    $excludeBookingId = preg_replace('/[^A-Za-z0-9-]/', '', (string) $excludeBookingId);
+    if ($excludeBookingId) {
+        $stmt = $pdo->prepare("SELECT * FROM booking_reservations WHERE status = 'confirmed' AND booking_id <> ? AND check_in < ? AND check_out > ? ORDER BY check_in");
+        $stmt->execute(array($excludeBookingId, $checkOut, $checkIn));
+    } else {
+        $stmt = $pdo->prepare("SELECT * FROM booking_reservations WHERE status = 'confirmed' AND check_in < ? AND check_out > ? ORDER BY check_in");
+        $stmt->execute(array($checkOut, $checkIn));
+    }
     return $stmt->fetchAll();
 }
 
@@ -166,6 +172,13 @@ function booking_create_reservation($data) {
         throw new Exception('Invalid reservation dates.');
     }
     $bookingId = !empty($data['booking_id']) ? preg_replace('/[^A-Za-z0-9-]/', '', $data['booking_id']) : booking_new_id();
+    $status = booking_reservation_status(isset($data['status']) ? $data['status'] : 'pending');
+    if ($status === 'confirmed') {
+        $overlaps = booking_confirmed_overlaps($checkIn, $checkOut, $bookingId);
+        if ($overlaps) {
+            throw new Exception('Cannot confirm this reservation because the date is already booked by ' . $overlaps[0]['booking_id'] . '.');
+        }
+    }
     $pdo = booking_pdo();
     $stmt = $pdo->prepare("INSERT INTO booking_reservations (booking_id, guest_name, phone, check_in, check_out, status, source, note) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE guest_name = VALUES(guest_name), phone = VALUES(phone), check_in = VALUES(check_in), check_out = VALUES(check_out), status = VALUES(status), note = VALUES(note)");
     $stmt->execute(array(
@@ -174,7 +187,7 @@ function booking_create_reservation($data) {
         isset($data['phone']) ? trim($data['phone']) : '',
         $checkIn,
         $checkOut,
-        booking_reservation_status(isset($data['status']) ? $data['status'] : 'pending'),
+        $status,
         isset($data['source']) ? trim($data['source']) : 'website',
         isset($data['note']) ? trim($data['note']) : '',
     ));
@@ -188,6 +201,18 @@ function booking_update_reservation_status($bookingId, $status) {
     }
     $status = booking_reservation_status($status);
     $pdo = booking_pdo();
+    if ($status === 'confirmed') {
+        $stmt = $pdo->prepare('SELECT check_in, check_out FROM booking_reservations WHERE booking_id = ?');
+        $stmt->execute(array($bookingId));
+        $reservation = $stmt->fetch();
+        if (!$reservation) {
+            return false;
+        }
+        $overlaps = booking_confirmed_overlaps($reservation['check_in'], $reservation['check_out'], $bookingId);
+        if ($overlaps) {
+            throw new Exception('Cannot confirm this reservation because the date is already booked by ' . $overlaps[0]['booking_id'] . '.');
+        }
+    }
     $stmt = $pdo->prepare('UPDATE booking_reservations SET status = ?, updated_at = NOW() WHERE booking_id = ?');
     $stmt->execute(array($status, $bookingId));
     return $stmt->rowCount() > 0;

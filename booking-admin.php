@@ -60,6 +60,27 @@ if ($loggedIn && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_inv
     }
 }
 
+if ($loggedIn && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_day_inventory'])) {
+    if (!booking_check_csrf()) {
+        $error = 'Session expired. Please try again.';
+    } else {
+        try {
+            $date = booking_iso_date($_POST['inventory_date']);
+            if (!$date) {
+                throw new Exception('Please enter a valid inventory date.');
+            }
+            $status = $_POST['status'] === 'closed' ? 'closed' : 'open';
+            $rate = max(0, (float) $_POST['rate']);
+            $minStay = max(1, (int) $_POST['min_stay']);
+            $note = trim($_POST['note']);
+            booking_upsert_inventory($date, $status, $rate, $minStay, $note);
+            $message = 'Inventory updated for ' . $date . '.';
+        } catch (Exception $e) {
+            $error = $e->getMessage();
+        }
+    }
+}
+
 if ($loggedIn && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_reservation'])) {
     if (!booking_check_csrf()) {
         $error = 'Session expired. Please try again.';
@@ -136,7 +157,7 @@ if ($loggedIn && booking_configured()) {
   <title>Booking Engine Admin | Upper Crest Homestay</title>
   <meta name="robots" content="noindex, nofollow" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" />
-  <link rel="stylesheet" href="css/style.css?v=20260728-booking-engine-2">
+  <link rel="stylesheet" href="css/style.css?v=20260728-booking-engine-3">
 </head>
 <body class="blog-admin-page">
   <main class="blog-admin-wrap booking-admin-wrap">
@@ -228,18 +249,36 @@ if ($loggedIn && booking_configured()) {
                 $date = date('Y-m-d', strtotime($month . ' +' . ($day - 1) . ' days'));
                 $row = isset($inventory[$date]) ? $inventory[$date] : null;
                 $inventoryStatus = $row ? $row['status'] : 'open';
+                $dayRate = $row ? (float) $row['rate'] : (float) booking_setting('BOOKING_DEFAULT_RATE', 3500);
+                $minStay = $row ? (int) $row['min_stay'] : 1;
+                $note = $row ? $row['note'] : '';
                 $bookings = isset($reservationBlocks[$date]) ? $reservationBlocks[$date] : array();
                 $isBooked = count($bookings) > 0;
                 $statusClass = $isBooked ? 'booked' : ($inventoryStatus === 'closed' ? 'closed' : 'open');
                 $statusLabel = $isBooked ? 'booked' : $inventoryStatus;
             ?>
               <div class="booking-day <?php echo booking_e($statusClass); ?>">
-                <strong><?php echo $day; ?></strong>
+                <div class="booking-day-top">
+                  <strong><?php echo $day; ?></strong>
+                  <b>INR <?php echo booking_e(number_format($dayRate, 0)); ?></b>
+                </div>
                 <span><?php echo strtoupper($statusLabel); ?></span>
                 <?php foreach ($bookings as $booking): ?>
                   <small><?php echo booking_e($booking['guest_name'] ?: $booking['booking_id']); ?></small>
                 <?php endforeach; ?>
                 <?php if ($row && $row['note']): ?><small><?php echo booking_e($row['note']); ?></small><?php endif; ?>
+                <form method="post" class="booking-day-edit">
+                  <input type="hidden" name="csrf" value="<?php echo booking_e($csrf); ?>">
+                  <input type="hidden" name="inventory_date" value="<?php echo booking_e($date); ?>">
+                  <input type="hidden" name="min_stay" value="<?php echo booking_e($minStay); ?>">
+                  <input type="hidden" name="note" value="<?php echo booking_e($note); ?>">
+                  <select name="status" aria-label="Day status">
+                    <option value="open" <?php echo $inventoryStatus === 'open' ? 'selected' : ''; ?>>Open</option>
+                    <option value="closed" <?php echo $inventoryStatus === 'closed' ? 'selected' : ''; ?>>Closed</option>
+                  </select>
+                  <input type="number" name="rate" min="0" step="1" value="<?php echo booking_e((int) $dayRate); ?>" aria-label="Nightly rate">
+                  <button type="submit" name="save_day_inventory" value="1">Save</button>
+                </form>
               </div>
             <?php endfor; ?>
           </div>

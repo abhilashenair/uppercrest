@@ -1,9 +1,9 @@
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzdDSIiV0JSlgVx2ymb39saPoIulAKRJay5QQYvVCrG7mKUK2us5pJI6_D5YfPd9LQP/exec";
+const SCRIPT_URL = "booking-engine-api.php";
 var bookedRanges = [];
 var currentBookingId = "";
 var currentBookingKey = "";
 
-fetch(SCRIPT_URL)
+fetch(SCRIPT_URL+"?action=booked-dates")
   .then(function(r){return r.json();})
   .then(function(data){
     var rows=data.bookedDates||data.bookings||[];
@@ -76,20 +76,30 @@ function checkAvailability(){
   if(!ci||!co){res.className="panel-result unavailable";res.textContent="Please select both check-in and check-out dates.";res.style.display="block";return;}
   var ciD=new Date(ci),coD=new Date(co),nights=Math.round((coD-ciD)/(1000*60*60*24));
   var avail=!bookedRanges.some(function(r){return ciD<new Date(r.check_out)&&coD>new Date(r.check_in);});
-  if(avail){
-    var bookingId=getBookingId(ci,co);
-    saveBookingEnquiry({booking_id:bookingId,name:"",phone:"",check_in:ci,check_out:co,status:"Pending"});
-    res.className="panel-result available";
-    res.innerHTML="&#10003; Available! "+nights+" night"+(nights>1?"s":"")+" from "+formatDate(ci)+" to "+formatDate(co)+". Fill in your details below to request a booking.";
-    res.style.display="block";
-    document.getElementById("nightsBadge").textContent=nights+" Night"+(nights>1?"s":"")+"  ·  Check-in "+formatDate(ci)+"  ·  Check-out "+formatDate(co);
-    document.getElementById("guestForm").style.display="block";
-  } else {
-    res.className="panel-result unavailable";
-    res.innerHTML="&#10007; Sorry, those dates are not available. Please try different dates.";
-    res.style.display="block";
-    document.getElementById("guestForm").style.display="none";
-  }
+  fetch(SCRIPT_URL+"?action=availability&check_in="+encodeURIComponent(ci)+"&check_out="+encodeURIComponent(co))
+    .then(function(r){return r.json();})
+    .then(function(data){
+      avail=!!data.available;
+      if(avail){
+        var bookingId=getBookingId(ci,co);
+        res.className="panel-result available";
+        res.innerHTML="&#10003; Available! "+nights+" night"+(nights>1?"s":"")+" from "+formatDate(ci)+" to "+formatDate(co)+". Total: "+(data.currency||"INR")+" "+(data.total||"").toLocaleString()+". Fill in your details below to request a booking.";
+        res.style.display="block";
+        document.getElementById("nightsBadge").textContent=nights+" Night"+(nights>1?"s":"")+"  ·  Check-in "+formatDate(ci)+"  ·  Check-out "+formatDate(co);
+        document.getElementById("guestForm").style.display="block";
+      } else {
+        res.className="panel-result unavailable";
+        res.innerHTML="&#10007; Sorry, those dates are not available. Please try different dates.";
+        res.style.display="block";
+        document.getElementById("guestForm").style.display="none";
+      }
+    })
+    .catch(function(){
+      res.className=avail?"panel-result available":"panel-result unavailable";
+      res.innerHTML=avail?"&#10003; Available. Fill in your details below to request a booking.":"&#10007; Sorry, those dates are not available.";
+      res.style.display="block";
+      document.getElementById("guestForm").style.display=avail?"block":"none";
+    });
 }
 function submitBooking(){
   var name=document.getElementById("guestName").value.trim(),phone=document.getElementById("guestPhone").value.trim();
@@ -112,15 +122,15 @@ function getBookingId(ci,co){
 function saveBookingEnquiry(data){
   fetch(SCRIPT_URL,{
     method:"POST",
+    headers:{"Content-Type":"application/json"},
     body:JSON.stringify({
       booking_id:data.booking_id,
       name:data.name,
       phone:data.phone,
       check_in:data.check_in,
       check_out:data.check_out,
-      from_date:formatSheetDate(data.check_in),
-      to_date:formatSheetDate(data.check_out),
-      status:data.status||"Pending"
+      status:data.status||"pending",
+      source:"website"
     })
   }).catch(function(){});
 }

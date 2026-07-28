@@ -1,8 +1,15 @@
 <?php
-$SHEET_URL = "https://script.google.com/macros/s/AKfycbzdDSIiV0JSlgVx2ymb39saPoIulAKRJay5QQYvVCrG7mKUK2us5pJI6_D5YfPd9LQP/exec";
-$response = @file_get_contents($SHEET_URL);
-$data = json_decode($response, true);
-$bookings = isset($data['bookedDates']) ? $data['bookedDates'] : [];
+require_once __DIR__ . '/booking-engine-lib.php';
+$bookings = array();
+try {
+    $from = date('Y-m-d');
+    $to = date('Y-m-d', strtotime('+365 days'));
+    foreach (booking_confirmed_overlaps($from, $to) as $reservation) {
+        $bookings[] = array('check_in' => $reservation['check_in'], 'check_out' => $reservation['check_out']);
+    }
+} catch (Exception $e) {
+    $bookings = array();
+}
 header('Content-Type: text/calendar; charset=utf-8');
 header('Content-Disposition: inline; filename="uppercrest.ics"');
 header('Cache-Control: no-cache, must-revalidate');

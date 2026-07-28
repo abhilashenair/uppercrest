@@ -83,3 +83,24 @@ https://theuppercrest.in/booking-engine-api.php?action=hotel-ads-xml&check_in=20
 ## 6. Google Hotel Ads note
 
 These endpoints expose live availability and prices from your MySQL engine. Actual Google Hotel Ads or Free Booking Links integration still requires a Google Hotel Center account, property matching, landing page setup, and Google certification/price accuracy checks.
+
+## 7. Google Vacation Rentals XML listing feed
+
+Public XML listing feed:
+
+```text
+https://theuppercrest.in/google-vacation-rentals-feed.xml
+```
+
+Google Vacation Rentals onboarding asks for XML list feeds to be shared as ZIP files with your Google Technical Account Manager. After deployment, create a ZIP on the server if Google asks for a hosted ZIP:
+
+```bash
+cd /var/www/html
+zip -j google-vacation-rentals-feed.zip google-vacation-rentals-feed.xml
+```
+
+Then share:
+
+```text
+https://theuppercrest.in/google-vacation-rentals-feed.zip
+```

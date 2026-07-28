@@ -357,9 +357,11 @@ if ($loggedIn && booking_configured()) {
             <div class="booking-api-list">
               <a class="btn btn-light" href="booking-engine-api.php?action=availability&check_in=<?php echo date('Y-m-d', strtotime(booking_today() . ' +1 day')); ?>&check_out=<?php echo date('Y-m-d', strtotime(booking_today() . ' +2 days')); ?>" target="_blank" rel="noopener">Test Availability API</a>
               <a class="btn btn-light" href="booking-engine-api.php?action=hotel-ads&check_in=<?php echo date('Y-m-d', strtotime(booking_today() . ' +1 day')); ?>&nights=1" target="_blank" rel="noopener">Test Hotel Ads API</a>
+              <a class="btn btn-light" href="google-vacation-rentals-feed.xml" target="_blank" rel="noopener">Vacation Rentals XML Feed</a>
             </div>
             <code class="booking-api-code">booking-engine-api.php?action=availability&amp;check_in=2026-08-01&amp;check_out=2026-08-02</code>
             <code class="booking-api-code">booking-engine-api.php?action=hotel-ads&amp;check_in=2026-08-01&amp;nights=1</code>
+            <code class="booking-api-code">google-vacation-rentals-feed.xml</code>
           </section>
           <?php endif; ?>
 

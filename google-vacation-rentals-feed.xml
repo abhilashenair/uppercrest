@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<listings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="http://www.gstatic.com/localfeed/local_feed.xsd">
+  <language>en</language>
+  <listing>
+    <id>uppercrest</id>
+    <name>The Upper Crest Homestay</name>
+    <address format="simple">
+      <component name="addr1">Near Karakattuchira, Poikattusserry</component>
+      <component name="city">Aluva</component>
+      <component name="province">Kerala</component>
+      <component name="postal_code">683578</component>
+    </address>
+    <country>IN</country>
+    <latitude>10.169054589945226</latitude>
+    <longitude>76.34689457592576</longitude>
+    <phone type="main">+91 92920 25275</phone>
+    <category>vacation_rental</category>
+    <content>
+      <text type="description">
+        <link>https://theuppercrest.in/</link>
+        <title>Private furnished homestay near Cochin International Airport</title>
+        <body>The Upper Crest Homestay is a private furnished whole-property stay in Poikattusserry, Aluva, Kerala, close to Cochin International Airport. The property includes a furnished bedroom with attached bathroom, living room, dining area, equipped kitchen, air conditioning, Wi-Fi, balcony, parking, washing machine, hot water and solar power backup. It is suitable for families, business travellers, airport stopovers and longer peaceful stays near Kochi Airport.</body>
+        <date month="7" day="28" year="2026"/>
+      </text>
+      <attributes>
+        <website>https://theuppercrest.in/</website>
+        <client_attr name="capacity">4</client_attr>
+        <client_attr name="number_of_bathrooms">1</client_attr>
+        <client_attr name="number_of_bedrooms">1</client_attr>
+        <client_attr name="number_of_beds">1</client_attr>
+        <client_attr name="number_of_living_rooms">1</client_attr>
+        <client_attr name="room_type">ENTIRE_PLACE</client_attr>
+        <client_attr name="ac">Yes</client_attr>
+        <client_attr name="balcony">Yes</client_attr>
+        <client_attr name="check_in_time">14:00</client_attr>
+        <client_attr name="check_out_time">11:00</client_attr>
+        <client_attr name="child_friendly">Yes</client_attr>
+        <client_attr name="free_breakfast">No</client_attr>
+        <client_attr name="instant_bookable">No</client_attr>
+        <client_attr name="internet_type">Free</client_attr>
+        <client_attr name="kitchen">Yes</client_attr>
+        <client_attr name="min_night_stay">1</client_attr>
+        <client_attr name="oven_stove">Yes</client_attr>
+        <client_attr name="parking_type">Free</client_attr>
+        <client_attr name="pets_allowed">No</client_attr>
+        <client_attr name="smoking_free_property">Yes</client_attr>
+        <client_attr name="tv">Yes</client_attr>
+        <client_attr name="washer_dryer">Yes</client_attr>
+      </attributes>
+      <image type="photo" url="https://theuppercrest.in/images/exterior-front-view.png">
+        <link>https://theuppercrest.in/images/exterior-front-view.png</link>
+        <title>The Upper Crest Homestay exterior front view</title>
+      </image>
+      <image type="photo" url="https://theuppercrest.in/images/living-room.jpeg">
+        <link>https://theuppercrest.in/images/living-room.jpeg</link>
+        <title>Living room at The Upper Crest Homestay</title>
+      </image>
+      <image type="photo" url="https://theuppercrest.in/images/bedroom-3.jpeg">
+        <link>https://theuppercrest.in/images/bedroom-3.jpeg</link>
+        <title>Furnished bedroom at The Upper Crest Homestay</title>
+      </image>
+      <image type="photo" url="https://theuppercrest.in/images/kitchen-1.jpeg">
+        <link>https://theuppercrest.in/images/kitchen-1.jpeg</link>
+        <title>Kitchen at The Upper Crest Homestay</title>
+      </image>
+      <image type="photo" url="https://theuppercrest.in/images/dining-area.jpeg">
+        <link>https://theuppercrest.in/images/dining-area.jpeg</link>
+        <title>Dining area at The Upper Crest Homestay</title>
+      </image>
+      <image type="photo" url="https://theuppercrest.in/images/bathroom-2.jpeg">
+        <link>https://theuppercrest.in/images/bathroom-2.jpeg</link>
+        <title>Attached bathroom at The Upper Crest Homestay</title>
+      </image>
+      <image type="photo" url="https://theuppercrest.in/images/living-room-1.png">
+        <link>https://theuppercrest.in/images/living-room-1.png</link>
+        <title>Living room seating at The Upper Crest Homestay</title>
+      </image>
+      <image type="photo" url="https://theuppercrest.in/images/bedroom-4.jpeg">
+        <link>https://theuppercrest.in/images/bedroom-4.jpeg</link>
+        <title>Additional bedroom view at The Upper Crest Homestay</title>
+      </image>
+    </content>
+  </listing>
+</listings>

@@ -181,6 +181,18 @@ function booking_create_reservation($data) {
     return $bookingId;
 }
 
+function booking_update_reservation_status($bookingId, $status) {
+    $bookingId = preg_replace('/[^A-Za-z0-9-]/', '', (string) $bookingId);
+    if (!$bookingId) {
+        throw new Exception('Booking ID is required.');
+    }
+    $status = booking_reservation_status($status);
+    $pdo = booking_pdo();
+    $stmt = $pdo->prepare('UPDATE booking_reservations SET status = ?, updated_at = NOW() WHERE booking_id = ?');
+    $stmt->execute(array($status, $bookingId));
+    return $stmt->rowCount() > 0;
+}
+
 function booking_new_id() {
     $bytes = function_exists('random_bytes') ? random_bytes(3) : openssl_random_pseudo_bytes(3);
     return 'UC-' . date('YmdHis') . '-' . strtoupper(substr(bin2hex($bytes), 0, 4));

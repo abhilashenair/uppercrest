@@ -82,6 +82,22 @@ if ($loggedIn && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_res
     }
 }
 
+if ($loggedIn && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_reservation_status'])) {
+    if (!booking_check_csrf()) {
+        $error = 'Session expired. Please try again.';
+    } else {
+        try {
+            $updated = booking_update_reservation_status(
+                isset($_POST['booking_id']) ? $_POST['booking_id'] : '',
+                isset($_POST['reservation_status']) ? $_POST['reservation_status'] : 'pending'
+            );
+            $message = $updated ? 'Reservation status updated.' : 'Reservation not found or already had that status.';
+        } catch (Exception $e) {
+            $error = $e->getMessage();
+        }
+    }
+}
+
 $csrf = $loggedIn ? booking_csrf() : '';
 $month = isset($_GET['month']) ? booking_iso_date($_GET['month'] . '-01') : date('Y-m-01');
 if (!$month) $month = date('Y-m-01');
@@ -89,6 +105,7 @@ $monthEnd = date('Y-m-t', strtotime($month));
 $nextDay = date('Y-m-d', strtotime($monthEnd . ' +1 day'));
 $inventory = array();
 $reservations = array();
+$reservationBlocks = array();
 if ($loggedIn && booking_configured()) {
     try {
         $inventory = booking_get_inventory($month, $nextDay);
@@ -96,6 +113,16 @@ if ($loggedIn && booking_configured()) {
         $stmt = $pdo->prepare('SELECT * FROM booking_reservations WHERE check_in < ? AND check_out > ? ORDER BY check_in DESC LIMIT 50');
         $stmt->execute(array(date('Y-m-d', strtotime($nextDay . ' +60 days')), date('Y-m-d', strtotime($month . ' -60 days'))));
         $reservations = $stmt->fetchAll();
+        foreach ($reservations as $reservation) {
+            if ($reservation['status'] !== 'confirmed') continue;
+            $blockStart = max($month, $reservation['check_in']);
+            $blockEnd = min($nextDay, $reservation['check_out']);
+            if ($blockEnd <= $blockStart) continue;
+            foreach (booking_date_range($blockStart, $blockEnd) as $date) {
+                if (!isset($reservationBlocks[$date])) $reservationBlocks[$date] = array();
+                $reservationBlocks[$date][] = $reservation;
+            }
+        }
     } catch (Exception $e) {
         $error = $error ?: $e->getMessage();
     }
@@ -109,7 +136,7 @@ if ($loggedIn && booking_configured()) {
   <title>Booking Engine Admin | Upper Crest Homestay</title>
   <meta name="robots" content="noindex, nofollow" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" />
-  <link rel="stylesheet" href="css/style.css?v=20260728-booking-engine">
+  <link rel="stylesheet" href="css/style.css?v=20260728-booking-engine-2">
 </head>
 <body class="blog-admin-page">
   <main class="blog-admin-wrap booking-admin-wrap">
@@ -200,11 +227,18 @@ if ($loggedIn && booking_configured()) {
               for ($day = 1; $day <= (int) date('t', strtotime($month)); $day++):
                 $date = date('Y-m-d', strtotime($month . ' +' . ($day - 1) . ' days'));
                 $row = isset($inventory[$date]) ? $inventory[$date] : null;
-                $status = $row ? $row['status'] : 'open';
+                $inventoryStatus = $row ? $row['status'] : 'open';
+                $bookings = isset($reservationBlocks[$date]) ? $reservationBlocks[$date] : array();
+                $isBooked = count($bookings) > 0;
+                $statusClass = $isBooked ? 'booked' : ($inventoryStatus === 'closed' ? 'closed' : 'open');
+                $statusLabel = $isBooked ? 'booked' : $inventoryStatus;
             ?>
-              <div class="booking-day <?php echo $status === 'closed' ? 'closed' : 'open'; ?>">
+              <div class="booking-day <?php echo booking_e($statusClass); ?>">
                 <strong><?php echo $day; ?></strong>
-                <span><?php echo strtoupper($status); ?></span>
+                <span><?php echo strtoupper($statusLabel); ?></span>
+                <?php foreach ($bookings as $booking): ?>
+                  <small><?php echo booking_e($booking['guest_name'] ?: $booking['booking_id']); ?></small>
+                <?php endforeach; ?>
                 <?php if ($row && $row['note']): ?><small><?php echo booking_e($row['note']); ?></small><?php endif; ?>
               </div>
             <?php endfor; ?>
@@ -219,7 +253,16 @@ if ($loggedIn && booking_configured()) {
               <div class="booking-reservation-row">
                 <strong><?php echo booking_e($reservation['booking_id']); ?></strong>
                 <span><?php echo booking_e($reservation['guest_name']); ?> · <?php echo booking_e($reservation['check_in']); ?> to <?php echo booking_e($reservation['check_out']); ?></span>
-                <em><?php echo booking_e($reservation['status']); ?></em>
+                <form method="post" class="booking-reservation-status-form">
+                  <input type="hidden" name="csrf" value="<?php echo booking_e($csrf); ?>">
+                  <input type="hidden" name="booking_id" value="<?php echo booking_e($reservation['booking_id']); ?>">
+                  <select name="reservation_status" aria-label="Reservation status">
+                    <?php foreach (array('pending', 'confirmed', 'cancelled') as $status): ?>
+                      <option value="<?php echo $status; ?>" <?php echo $reservation['status'] === $status ? 'selected' : ''; ?>><?php echo ucfirst($status); ?></option>
+                    <?php endforeach; ?>
+                  </select>
+                  <button type="submit" name="update_reservation_status" value="1">Update</button>
+                </form>
               </div>
             <?php endforeach; ?>
           </div>

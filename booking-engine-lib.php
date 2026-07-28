@@ -17,6 +17,12 @@ function booking_setting($name, $fallback) {
     return defined($name) ? constant($name) : $fallback;
 }
 
+function booking_today() {
+    $timezone = booking_setting('BOOKING_TIMEZONE', 'Asia/Kolkata');
+    $now = new DateTime('now', new DateTimeZone($timezone));
+    return $now->format('Y-m-d');
+}
+
 function booking_pdo() {
     static $pdo = null;
     if ($pdo) return $pdo;
@@ -120,6 +126,22 @@ function booking_availability($checkIn, $checkOut) {
     if (!$checkIn || !$checkOut || $checkOut <= $checkIn) {
         return array('ok' => false, 'available' => false, 'error' => 'Invalid check-in or check-out date.');
     }
+    if ($checkIn < booking_today()) {
+        return array(
+            'ok' => true,
+            'available' => false,
+            'check_in' => $checkIn,
+            'check_out' => $checkOut,
+            'nights' => booking_nights($checkIn, $checkOut),
+            'currency' => booking_setting('BOOKING_CURRENCY', 'INR'),
+            'base_rate' => 0,
+            'subtotal' => 0,
+            'taxes' => 0,
+            'total' => 0,
+            'closed_dates' => array($checkIn),
+            'notes' => array('Past dates are not available.'),
+        );
+    }
     $nights = booking_nights($checkIn, $checkOut);
     $inventory = booking_get_inventory($checkIn, $checkOut);
     $closed = array();
@@ -170,6 +192,9 @@ function booking_create_reservation($data) {
     $checkOut = booking_iso_date(isset($data['check_out']) ? $data['check_out'] : '');
     if (!$checkIn || !$checkOut || $checkOut <= $checkIn) {
         throw new Exception('Invalid reservation dates.');
+    }
+    if ($checkIn < booking_today()) {
+        throw new Exception('Past dates cannot be reserved.');
     }
     $bookingId = !empty($data['booking_id']) ? preg_replace('/[^A-Za-z0-9-]/', '', $data['booking_id']) : booking_new_id();
     $status = booking_reservation_status(isset($data['status']) ? $data['status'] : 'pending');

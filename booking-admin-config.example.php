@@ -17,3 +17,4 @@ define('BOOKING_CURRENCY', 'INR');
 define('BOOKING_DEFAULT_RATE', 3500);
 define('BOOKING_TAX_RATE', 0);
 define('BOOKING_MAX_ADVANCE_DAYS', 365);
+define('BOOKING_TIMEZONE', 'Asia/Kolkata');

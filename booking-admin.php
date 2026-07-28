@@ -12,12 +12,23 @@ if (isset($_GET['logout'])) {
     exit;
 }
 
+$adminPages = array(
+    'open-close-date' => 'Open or Close Date',
+    'add-update-reservation' => 'Add / Update Reservation',
+    'calendar' => 'Calendar',
+    'recent-reservations' => 'Recent Reservations',
+    'hotel-apis' => 'Hotel APIs',
+    'mysql-setup' => 'Create / Update MySQL',
+);
+$activePage = isset($_GET['page']) ? $_GET['page'] : 'calendar';
+if (!isset($adminPages[$activePage])) $activePage = 'calendar';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     $username = isset($_POST['username']) ? $_POST['username'] : '';
     $password = isset($_POST['password']) ? $_POST['password'] : '';
     if (booking_admin_username_ok($username) && booking_admin_password_ok($password)) {
         $_SESSION['booking_admin'] = true;
-        header('Location: booking-admin.php');
+        header('Location: booking-admin.php?page=calendar');
         exit;
     }
     $error = 'Invalid username or password.';
@@ -48,6 +59,12 @@ if ($loggedIn && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_inv
             if (!$from || !$to || $to < $from) {
                 throw new Exception('Please enter a valid inventory date range.');
             }
+            if ($to < booking_today()) {
+                throw new Exception('Past dates are already blocked.');
+            }
+            if ($from < booking_today()) {
+                $from = booking_today();
+            }
             $status = $_POST['status'] === 'closed' ? 'closed' : 'open';
             $rate = max(0, (float) $_POST['rate']);
             $minStay = max(1, (int) $_POST['min_stay']);
@@ -70,6 +87,9 @@ if ($loggedIn && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_day
             $date = booking_iso_date($_POST['inventory_date']);
             if (!$date) {
                 throw new Exception('Please enter a valid inventory date.');
+            }
+            if ($date < booking_today()) {
+                throw new Exception('Past dates are already blocked.');
             }
             $status = $_POST['status'] === 'closed' ? 'closed' : 'open';
             $rate = max(0, (float) $_POST['rate']);
@@ -122,8 +142,8 @@ if ($loggedIn && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_r
 }
 
 $csrf = $loggedIn ? booking_csrf() : '';
-$month = isset($_GET['month']) ? booking_iso_date($_GET['month'] . '-01') : date('Y-m-01');
-if (!$month) $month = date('Y-m-01');
+$month = isset($_GET['month']) ? booking_iso_date($_GET['month'] . '-01') : date('Y-m-01', strtotime(booking_today()));
+if (!$month) $month = date('Y-m-01', strtotime(booking_today()));
 $monthEnd = date('Y-m-t', strtotime($month));
 $nextDay = date('Y-m-d', strtotime($monthEnd . ' +1 day'));
 $inventory = array();
@@ -159,7 +179,7 @@ if ($loggedIn && booking_configured()) {
   <title>Booking Engine Admin | Upper Crest Homestay</title>
   <meta name="robots" content="noindex, nofollow" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" />
-  <link rel="stylesheet" href="css/style.css?v=20260728-booking-engine-4">
+  <link rel="stylesheet" href="css/style.css?v=20260728-booking-engine-5">
 </head>
 <body class="blog-admin-page">
   <main class="blog-admin-wrap booking-admin-wrap">
@@ -189,22 +209,26 @@ if ($loggedIn && booking_configured()) {
         <?php if ($error): ?><div class="blog-admin-alert error"><?php echo booking_e($error); ?></div><?php endif; ?>
 
         <nav class="booking-admin-menu" aria-label="Booking admin menu">
-          <a href="#open-close-date">1. Open or Close Date</a>
-          <a href="#add-update-reservation">2. Add / Update Reservation</a>
-          <a href="#calendar">3. Calendar</a>
-          <a href="#recent-reservations">4. Recent Reservations</a>
-          <a href="#hotel-apis">5. Hotel APIs</a>
-          <a href="#mysql-setup">6. Create / Update MySQL</a>
+          <a class="<?php echo $activePage === 'open-close-date' ? 'active' : ''; ?>" href="booking-admin.php?page=open-close-date">1. Open or Close Date</a>
+          <a class="<?php echo $activePage === 'add-update-reservation' ? 'active' : ''; ?>" href="booking-admin.php?page=add-update-reservation">2. Add / Update Reservation</a>
+          <a class="<?php echo $activePage === 'calendar' ? 'active' : ''; ?>" href="booking-admin.php?page=calendar">3. Calendar</a>
+          <a class="<?php echo $activePage === 'recent-reservations' ? 'active' : ''; ?>" href="booking-admin.php?page=recent-reservations">4. Recent Reservations</a>
+          <a class="<?php echo $activePage === 'hotel-apis' ? 'active' : ''; ?>" href="booking-admin.php?page=hotel-apis">5. Hotel APIs</a>
+          <a class="<?php echo $activePage === 'mysql-setup' ? 'active' : ''; ?>" href="booking-admin.php?page=mysql-setup">6. Create / Update MySQL</a>
         </nav>
 
+        <h2 class="booking-admin-page-title"><?php echo booking_e($adminPages[$activePage]); ?></h2>
+
+        <?php if ($activePage === 'open-close-date' || $activePage === 'add-update-reservation'): ?>
         <div class="booking-admin-grid">
+          <?php if ($activePage === 'open-close-date'): ?>
           <section class="blog-admin-card" id="open-close-date">
             <h2>Open / Close Dates</h2>
             <form method="post" class="booking-inventory-form">
               <input type="hidden" name="csrf" value="<?php echo booking_e($csrf); ?>">
               <div class="blog-admin-row">
-                <div><label>From Date</label><input type="date" name="from_date" required value="<?php echo date('Y-m-d'); ?>"></div>
-                <div><label>To Date</label><input type="date" name="to_date" required value="<?php echo date('Y-m-d'); ?>"></div>
+                <div><label>From Date</label><input type="date" name="from_date" required value="<?php echo booking_e(booking_today()); ?>"></div>
+                <div><label>To Date</label><input type="date" name="to_date" required value="<?php echo booking_e(booking_today()); ?>"></div>
               </div>
               <div class="blog-admin-row">
                 <div><label>Status</label><select name="status"><option value="open">Open</option><option value="closed">Closed</option></select></div>
@@ -217,7 +241,9 @@ if ($loggedIn && booking_configured()) {
               <button class="btn btn-primary" type="submit" name="save_inventory" value="1">Save Inventory</button>
             </form>
           </section>
+          <?php endif; ?>
 
+          <?php if ($activePage === 'add-update-reservation'): ?>
           <section class="blog-admin-card" id="add-update-reservation">
             <h2>Add / Update Reservation</h2>
             <form method="post">
@@ -237,13 +263,16 @@ if ($loggedIn && booking_configured()) {
               <button class="btn btn-primary" type="submit" name="save_reservation" value="1">Save Reservation</button>
             </form>
           </section>
+          <?php endif; ?>
         </div>
+        <?php endif; ?>
 
+        <?php if ($activePage === 'calendar'): ?>
         <section class="blog-admin-card booking-calendar-card" id="calendar">
           <div class="booking-month-nav">
-            <a href="booking-admin.php?month=<?php echo date('Y-m', strtotime($month . ' -1 month')); ?>">&larr; Previous</a>
+            <a href="booking-admin.php?page=calendar&month=<?php echo date('Y-m', strtotime($month . ' -1 month')); ?>">&larr; Previous</a>
             <h2><?php echo date('F Y', strtotime($month)); ?></h2>
-            <a href="booking-admin.php?month=<?php echo date('Y-m', strtotime($month . ' +1 month')); ?>">Next &rarr;</a>
+            <a href="booking-admin.php?page=calendar&month=<?php echo date('Y-m', strtotime($month . ' +1 month')); ?>">Next &rarr;</a>
           </div>
           <div class="booking-calendar-grid">
             <?php foreach (array('Mon','Tue','Wed','Thu','Fri','Sat','Sun') as $day): ?><div class="booking-day-head"><?php echo $day; ?></div><?php endforeach; ?>
@@ -259,8 +288,9 @@ if ($loggedIn && booking_configured()) {
                 $note = $row ? $row['note'] : '';
                 $bookings = isset($reservationBlocks[$date]) ? $reservationBlocks[$date] : array();
                 $isBooked = count($bookings) > 0;
-                $statusClass = $isBooked ? 'booked' : ($inventoryStatus === 'closed' ? 'closed' : 'open');
-                $statusLabel = $isBooked ? 'booked' : $inventoryStatus;
+                $isPast = $date < booking_today();
+                $statusClass = $isPast ? 'past' : ($isBooked ? 'booked' : ($inventoryStatus === 'closed' ? 'closed' : 'open'));
+                $statusLabel = $isPast ? 'blocked' : ($isBooked ? 'booked' : $inventoryStatus);
             ?>
               <div class="booking-day <?php echo booking_e($statusClass); ?>">
                 <div class="booking-day-top">
@@ -272,6 +302,8 @@ if ($loggedIn && booking_configured()) {
                   <small><?php echo booking_e($booking['guest_name'] ?: $booking['booking_id']); ?></small>
                 <?php endforeach; ?>
                 <?php if ($row && $row['note']): ?><small><?php echo booking_e($row['note']); ?></small><?php endif; ?>
+                <?php if ($isPast): ?><small>Past date</small><?php endif; ?>
+                <?php if (!$isPast): ?>
                 <form method="post" class="booking-day-edit">
                   <input type="hidden" name="csrf" value="<?php echo booking_e($csrf); ?>">
                   <input type="hidden" name="inventory_date" value="<?php echo booking_e($date); ?>">
@@ -284,11 +316,14 @@ if ($loggedIn && booking_configured()) {
                   <input type="number" name="rate" min="0" step="1" value="<?php echo booking_e((int) $dayRate); ?>" aria-label="Nightly rate">
                   <button type="submit" name="save_day_inventory" value="1">Save</button>
                 </form>
+                <?php endif; ?>
               </div>
             <?php endfor; ?>
           </div>
         </section>
+        <?php endif; ?>
 
+        <?php if ($activePage === 'recent-reservations'): ?>
         <section class="blog-admin-card" id="recent-reservations">
           <h2>Recent Reservations</h2>
           <div class="booking-reservation-list">
@@ -311,19 +346,24 @@ if ($loggedIn && booking_configured()) {
             <?php endforeach; ?>
           </div>
         </section>
+        <?php endif; ?>
 
+        <?php if ($activePage === 'hotel-apis' || $activePage === 'mysql-setup'): ?>
         <div class="booking-admin-grid booking-admin-bottom-grid">
+          <?php if ($activePage === 'hotel-apis'): ?>
           <section class="blog-admin-card" id="hotel-apis">
             <h2>Hotel APIs</h2>
             <p class="blog-muted">Use these endpoints for testing availability and Google Hotel Ads integration.</p>
             <div class="booking-api-list">
-              <a class="btn btn-light" href="booking-engine-api.php?action=availability&check_in=<?php echo date('Y-m-d', strtotime('+1 day')); ?>&check_out=<?php echo date('Y-m-d', strtotime('+2 days')); ?>" target="_blank" rel="noopener">Test Availability API</a>
-              <a class="btn btn-light" href="booking-engine-api.php?action=hotel-ads&check_in=<?php echo date('Y-m-d', strtotime('+1 day')); ?>&nights=1" target="_blank" rel="noopener">Test Hotel Ads API</a>
+              <a class="btn btn-light" href="booking-engine-api.php?action=availability&check_in=<?php echo date('Y-m-d', strtotime(booking_today() . ' +1 day')); ?>&check_out=<?php echo date('Y-m-d', strtotime(booking_today() . ' +2 days')); ?>" target="_blank" rel="noopener">Test Availability API</a>
+              <a class="btn btn-light" href="booking-engine-api.php?action=hotel-ads&check_in=<?php echo date('Y-m-d', strtotime(booking_today() . ' +1 day')); ?>&nights=1" target="_blank" rel="noopener">Test Hotel Ads API</a>
             </div>
             <code class="booking-api-code">booking-engine-api.php?action=availability&amp;check_in=2026-08-01&amp;check_out=2026-08-02</code>
             <code class="booking-api-code">booking-engine-api.php?action=hotel-ads&amp;check_in=2026-08-01&amp;nights=1</code>
           </section>
+          <?php endif; ?>
 
+          <?php if ($activePage === 'mysql-setup'): ?>
           <section class="blog-admin-card" id="mysql-setup">
             <h2>Create / Update MySQL</h2>
             <p class="blog-muted">Run this after first deployment or whenever the schema file is updated.</p>
@@ -332,7 +372,9 @@ if ($loggedIn && booking_configured()) {
               <button class="btn btn-primary" type="submit" name="install_schema" value="1">Create / Update MySQL Tables</button>
             </form>
           </section>
+          <?php endif; ?>
         </div>
+        <?php endif; ?>
       <?php endif; ?>
     </div>
   </main>

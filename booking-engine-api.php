@@ -20,11 +20,20 @@ try {
     }
 
     if ($action === 'booked-dates') {
-        $from = isset($_GET['from']) ? booking_iso_date($_GET['from']) : date('Y-m-d');
+        $from = isset($_GET['from']) ? booking_iso_date($_GET['from']) : booking_today();
+        if (!$from) $from = booking_today();
         $days = isset($_GET['days']) ? max(1, min(730, (int) $_GET['days'])) : 365;
         $to = date('Y-m-d', strtotime($from . ' +' . $days . ' days'));
         $inventory = booking_get_inventory($from, $to);
         $booked = array();
+        foreach (booking_date_range($from, min($to, booking_today())) as $date) {
+            $booked[] = array(
+                'check_in' => $date,
+                'check_out' => date('Y-m-d', strtotime($date . ' +1 day')),
+                'status' => 'confirmed',
+                'reason' => 'past'
+            );
+        }
         foreach ($inventory as $date => $row) {
             if ($row['status'] === 'closed') {
                 $booked[] = array(

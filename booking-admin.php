@@ -13,12 +13,14 @@ if (isset($_GET['logout'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
-    if (booking_admin_password_ok(isset($_POST['password']) ? $_POST['password'] : '')) {
+    $username = isset($_POST['username']) ? $_POST['username'] : '';
+    $password = isset($_POST['password']) ? $_POST['password'] : '';
+    if (booking_admin_username_ok($username) && booking_admin_password_ok($password)) {
         $_SESSION['booking_admin'] = true;
         header('Location: booking-admin.php');
         exit;
     }
-    $error = 'Invalid password.';
+    $error = 'Invalid username or password.';
 }
 
 $loggedIn = !empty($_SESSION['booking_admin']);
@@ -157,7 +159,7 @@ if ($loggedIn && booking_configured()) {
   <title>Booking Engine Admin | Upper Crest Homestay</title>
   <meta name="robots" content="noindex, nofollow" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" />
-  <link rel="stylesheet" href="css/style.css?v=20260728-booking-engine-3">
+  <link rel="stylesheet" href="css/style.css?v=20260728-booking-engine-4">
 </head>
 <body class="blog-admin-page">
   <main class="blog-admin-wrap booking-admin-wrap">
@@ -176,24 +178,27 @@ if ($loggedIn && booking_configured()) {
         <form class="blog-admin-card blog-login" method="post">
           <h2>Sign In</h2>
           <?php if ($error): ?><div class="blog-admin-alert error"><?php echo booking_e($error); ?></div><?php endif; ?>
+          <label>Username</label>
+          <input type="text" name="username" required autofocus value="admin">
           <label>Password</label>
-          <input type="password" name="password" required autofocus>
+          <input type="password" name="password" required>
           <button class="btn btn-primary" type="submit" name="login" value="1">Open Dashboard</button>
         </form>
       <?php else: ?>
         <?php if ($message): ?><div class="blog-admin-alert success"><?php echo booking_e($message); ?></div><?php endif; ?>
         <?php if ($error): ?><div class="blog-admin-alert error"><?php echo booking_e($error); ?></div><?php endif; ?>
 
-        <div class="booking-admin-actions-top">
-          <form method="post">
-            <input type="hidden" name="csrf" value="<?php echo booking_e($csrf); ?>">
-            <button class="btn btn-primary" type="submit" name="install_schema" value="1">Create / Update MySQL Tables</button>
-          </form>
-          <a class="btn btn-light" href="booking-engine-api.php?action=hotel-ads&check_in=<?php echo date('Y-m-d', strtotime('+1 day')); ?>&nights=1" target="_blank" rel="noopener">Test Hotel Ads API</a>
-        </div>
+        <nav class="booking-admin-menu" aria-label="Booking admin menu">
+          <a href="#open-close-date">1. Open or Close Date</a>
+          <a href="#add-update-reservation">2. Add / Update Reservation</a>
+          <a href="#calendar">3. Calendar</a>
+          <a href="#recent-reservations">4. Recent Reservations</a>
+          <a href="#hotel-apis">5. Hotel APIs</a>
+          <a href="#mysql-setup">6. Create / Update MySQL</a>
+        </nav>
 
         <div class="booking-admin-grid">
-          <section class="blog-admin-card">
+          <section class="blog-admin-card" id="open-close-date">
             <h2>Open / Close Dates</h2>
             <form method="post" class="booking-inventory-form">
               <input type="hidden" name="csrf" value="<?php echo booking_e($csrf); ?>">
@@ -213,7 +218,7 @@ if ($loggedIn && booking_configured()) {
             </form>
           </section>
 
-          <section class="blog-admin-card">
+          <section class="blog-admin-card" id="add-update-reservation">
             <h2>Add / Update Reservation</h2>
             <form method="post">
               <input type="hidden" name="csrf" value="<?php echo booking_e($csrf); ?>">
@@ -234,7 +239,7 @@ if ($loggedIn && booking_configured()) {
           </section>
         </div>
 
-        <section class="blog-admin-card booking-calendar-card">
+        <section class="blog-admin-card booking-calendar-card" id="calendar">
           <div class="booking-month-nav">
             <a href="booking-admin.php?month=<?php echo date('Y-m', strtotime($month . ' -1 month')); ?>">&larr; Previous</a>
             <h2><?php echo date('F Y', strtotime($month)); ?></h2>
@@ -284,7 +289,7 @@ if ($loggedIn && booking_configured()) {
           </div>
         </section>
 
-        <section class="blog-admin-card">
+        <section class="blog-admin-card" id="recent-reservations">
           <h2>Recent Reservations</h2>
           <div class="booking-reservation-list">
             <?php if (!$reservations): ?><p class="blog-muted">No reservations yet.</p><?php endif; ?>
@@ -306,6 +311,28 @@ if ($loggedIn && booking_configured()) {
             <?php endforeach; ?>
           </div>
         </section>
+
+        <div class="booking-admin-grid booking-admin-bottom-grid">
+          <section class="blog-admin-card" id="hotel-apis">
+            <h2>Hotel APIs</h2>
+            <p class="blog-muted">Use these endpoints for testing availability and Google Hotel Ads integration.</p>
+            <div class="booking-api-list">
+              <a class="btn btn-light" href="booking-engine-api.php?action=availability&check_in=<?php echo date('Y-m-d', strtotime('+1 day')); ?>&check_out=<?php echo date('Y-m-d', strtotime('+2 days')); ?>" target="_blank" rel="noopener">Test Availability API</a>
+              <a class="btn btn-light" href="booking-engine-api.php?action=hotel-ads&check_in=<?php echo date('Y-m-d', strtotime('+1 day')); ?>&nights=1" target="_blank" rel="noopener">Test Hotel Ads API</a>
+            </div>
+            <code class="booking-api-code">booking-engine-api.php?action=availability&amp;check_in=2026-08-01&amp;check_out=2026-08-02</code>
+            <code class="booking-api-code">booking-engine-api.php?action=hotel-ads&amp;check_in=2026-08-01&amp;nights=1</code>
+          </section>
+
+          <section class="blog-admin-card" id="mysql-setup">
+            <h2>Create / Update MySQL</h2>
+            <p class="blog-muted">Run this after first deployment or whenever the schema file is updated.</p>
+            <form method="post" class="booking-schema-form">
+              <input type="hidden" name="csrf" value="<?php echo booking_e($csrf); ?>">
+              <button class="btn btn-primary" type="submit" name="install_schema" value="1">Create / Update MySQL Tables</button>
+            </form>
+          </section>
+        </div>
       <?php endif; ?>
     </div>
   </main>

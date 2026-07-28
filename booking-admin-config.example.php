@@ -8,6 +8,7 @@ define('BOOKING_DB_USER', 'uppercrest_user');
 define('BOOKING_DB_PASS', 'change-this-db-password');
 define('BOOKING_DB_CHARSET', 'utf8mb4');
 
+define('BOOKING_ADMIN_USERNAME', 'admin');
 define('BOOKING_ADMIN_PASSWORD', 'change-this-admin-password');
 
 define('BOOKING_PROPERTY_ID', 'uppercrest');

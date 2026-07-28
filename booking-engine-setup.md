@@ -21,7 +21,7 @@ cp booking-admin-config.example.php booking-admin-config.php
 nano booking-admin-config.php
 ```
 
-Set the MySQL values and a strong admin password.
+Set the MySQL values, `BOOKING_ADMIN_USERNAME`, and a strong admin password.
 
 Then copy to Apache root:
 

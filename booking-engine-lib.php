@@ -240,6 +240,11 @@ function booking_admin_password_ok($password) {
     return false;
 }
 
+function booking_admin_username_ok($username) {
+    $expected = booking_setting('BOOKING_ADMIN_USERNAME', 'admin');
+    return hash_equals((string) $expected, trim((string) $username));
+}
+
 function booking_admin_configured() {
     booking_load_config();
     return (defined('BOOKING_ADMIN_PASSWORD_HASH') && BOOKING_ADMIN_PASSWORD_HASH) || (defined('BOOKING_ADMIN_PASSWORD') && BOOKING_ADMIN_PASSWORD);

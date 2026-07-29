@@ -96,6 +96,40 @@ function booking_nights($checkIn, $checkOut) {
     return max(0, (int) $start->diff($end)->days);
 }
 
+function booking_rate_plan() {
+    $plan = booking_setting('BOOKING_RATE_PLAN', array(
+        30 => 1500,
+        15 => 2000,
+        10 => 2500,
+        7 => 3000,
+        2 => 3250,
+        1 => 3500,
+    ));
+    if (!is_array($plan)) {
+        $plan = array(1 => (float) booking_setting('BOOKING_DEFAULT_RATE', 3500));
+    }
+    krsort($plan, SORT_NUMERIC);
+    return $plan;
+}
+
+function booking_rate_for_nights($nights) {
+    foreach (booking_rate_plan() as $minimumNights => $rate) {
+        if ($nights >= (int) $minimumNights) {
+            return (float) $rate;
+        }
+    }
+    return (float) booking_setting('BOOKING_DEFAULT_RATE', 3500);
+}
+
+function booking_rate_plan_label($nights) {
+    foreach (booking_rate_plan() as $minimumNights => $rate) {
+        if ($nights >= (int) $minimumNights) {
+            return (int) $minimumNights . '+ night rate';
+        }
+    }
+    return 'standard rate';
+}
+
 function booking_get_inventory($from, $to) {
     $pdo = booking_pdo();
     $stmt = $pdo->prepare('SELECT * FROM booking_inventory WHERE inventory_date >= ? AND inventory_date < ? ORDER BY inventory_date');
@@ -135,6 +169,7 @@ function booking_availability($checkIn, $checkOut) {
             'nights' => booking_nights($checkIn, $checkOut),
             'currency' => booking_setting('BOOKING_CURRENCY', 'INR'),
             'base_rate' => 0,
+            'rate_plan' => 'past date blocked',
             'subtotal' => 0,
             'taxes' => 0,
             'total' => 0,
@@ -147,10 +182,12 @@ function booking_availability($checkIn, $checkOut) {
     $closed = array();
     $notes = array();
     $total = 0.0;
-    $defaultRate = (float) booking_setting('BOOKING_DEFAULT_RATE', 3500);
+    $defaultRate = booking_rate_for_nights($nights);
+    $dailyRates = array();
     foreach (booking_date_range($checkIn, $checkOut) as $date) {
         $row = isset($inventory[$date]) ? $inventory[$date] : null;
         $rate = $row ? (float) $row['rate'] : $defaultRate;
+        $dailyRates[$date] = $rate;
         $total += $rate;
         if ($row && $row['status'] === 'closed') {
             $closed[] = $date;
@@ -173,9 +210,12 @@ function booking_availability($checkIn, $checkOut) {
         'nights' => $nights,
         'currency' => booking_setting('BOOKING_CURRENCY', 'INR'),
         'base_rate' => round($nights ? $total / $nights : 0, 2),
+        'rate_plan' => booking_rate_plan_label($nights),
+        'tier_rate' => round($defaultRate, 2),
         'subtotal' => round($total, 2),
         'taxes' => $taxes,
         'total' => round($total + $taxes, 2),
+        'daily_rates' => $dailyRates,
         'closed_dates' => array_values(array_unique($closed)),
         'notes' => $notes,
     );

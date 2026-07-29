@@ -23,6 +23,19 @@ nano booking-admin-config.php
 
 Set the MySQL values, `BOOKING_ADMIN_USERNAME`, `BOOKING_TIMEZONE`, and a strong admin password.
 
+Optional rate plan override:
+
+```php
+define('BOOKING_RATE_PLAN', array(
+    30 => 1500,
+    15 => 2000,
+    10 => 2500,
+    7 => 3000,
+    2 => 3250,
+    1 => 3500,
+));
+```
+
 Then copy to Apache root:
 
 ```bash
@@ -51,6 +64,8 @@ In the dashboard, use Open / Close Dates:
 - Closed = blocked even if there is no reservation.
 - Narration / Note = reason such as maintenance, owner blocked, phone booking.
 - Rate = nightly rate used by the API.
+- Default rates are tiered by stay length: 1 night INR 3500, 2+ nights INR 3250, 7+ nights INR 3000, 10+ nights INR 2500, 15+ nights INR 2000, 30+ nights INR 1500 per night.
+- Calendar day rates override the tier rate for that specific date.
 
 Confirmed reservations also block dates.
 

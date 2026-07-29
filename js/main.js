@@ -82,8 +82,10 @@ function checkAvailability(){
       avail=!!data.available;
       if(avail){
         var bookingId=getBookingId(ci,co);
+        var nightlyRate=Number(data.tier_rate||data.base_rate||0);
+        var rateText=nightlyRate ? " Rate: "+(data.currency||"INR")+" "+nightlyRate.toLocaleString()+" per night." : "";
         res.className="panel-result available";
-        res.innerHTML="&#10003; Available! "+nights+" night"+(nights>1?"s":"")+" from "+formatDate(ci)+" to "+formatDate(co)+". Total: "+(data.currency||"INR")+" "+(data.total||"").toLocaleString()+". Fill in your details below to request a booking.";
+        res.innerHTML="&#10003; Available! "+nights+" night"+(nights>1?"s":"")+" from "+formatDate(ci)+" to "+formatDate(co)+"."+rateText+" Total: "+(data.currency||"INR")+" "+(data.total||"").toLocaleString()+". Fill in your details below to request a booking.";
         res.style.display="block";
         document.getElementById("nightsBadge").textContent=nights+" Night"+(nights>1?"s":"")+"  ·  Check-in "+formatDate(ci)+"  ·  Check-out "+formatDate(co);
         document.getElementById("guestForm").style.display="block";

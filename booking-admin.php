@@ -362,6 +362,12 @@ if ($loggedIn && booking_configured()) {
             <code class="booking-api-code">booking-engine-api.php?action=availability&amp;check_in=2026-08-01&amp;check_out=2026-08-02</code>
             <code class="booking-api-code">booking-engine-api.php?action=hotel-ads&amp;check_in=2026-08-01&amp;nights=1</code>
             <code class="booking-api-code">google-vacation-rentals-feed.xml</code>
+            <div class="booking-rate-plan">
+              <strong>Current rate plan</strong>
+              <?php foreach (booking_rate_plan() as $minimumNights => $rate): ?>
+                <span><?php echo (int) $minimumNights; ?>+ nights: INR <?php echo booking_e(number_format((float) $rate, 0)); ?> / night</span>
+              <?php endforeach; ?>
+            </div>
           </section>
           <?php endif; ?>
 

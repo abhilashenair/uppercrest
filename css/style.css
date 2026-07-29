@@ -176,6 +176,7 @@ footer{background:var(--dark);color:rgba(255,255,255,.78);padding:52px 0 0;font-
 .footer-link:hover{color:var(--gold)}
 .footer-bottom{text-align:center;padding:22px 0;color:rgba(255,255,255,.45);font-size:13px;line-height:1.6}
 .pricing-wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-bottom:32px}
+.pricing-wrap.dynamic-pricing{grid-template-columns:repeat(3,minmax(0,1fr));max-width:1100px;margin:0 auto 32px}
 .price-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:30px 24px;text-align:center;position:relative;transition:box-shadow .2s}
 .price-card:hover{box-shadow:var(--shadow)}
 .price-card.popular{border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,155,60,.18)}

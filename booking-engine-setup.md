@@ -26,6 +26,7 @@ Set the MySQL values, `BOOKING_ADMIN_USERNAME`, `BOOKING_TIMEZONE`, and a strong
 Optional rate plan override:
 
 ```php
+define('BOOKING_RACK_RATE', 4500);
 define('BOOKING_RATE_PLAN', array(
     30 => 1500,
     15 => 2000,

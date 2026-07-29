@@ -14,6 +14,7 @@ define('BOOKING_ADMIN_PASSWORD', 'change-this-admin-password');
 define('BOOKING_PROPERTY_ID', 'uppercrest');
 define('BOOKING_PROPERTY_NAME', 'The Upper Crest');
 define('BOOKING_CURRENCY', 'INR');
+define('BOOKING_RACK_RATE', 4500);
 define('BOOKING_DEFAULT_RATE', 3500);
 define('BOOKING_RATE_PLAN', array(
     30 => 1500,

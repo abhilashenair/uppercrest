@@ -19,6 +19,27 @@ try {
         booking_json(booking_availability($checkIn, $checkOut));
     }
 
+    if ($action === 'rate-plan') {
+        $plans = array();
+        foreach (booking_rate_plan() as $minimumNights => $rate) {
+            $plans[] = array(
+                'minimum_nights' => (int) $minimumNights,
+                'nightly_rate' => (float) $rate,
+                'currency' => booking_setting('BOOKING_CURRENCY', 'INR'),
+                'total' => (int) $minimumNights * (float) $rate,
+            );
+        }
+        usort($plans, function ($a, $b) {
+            return $a['minimum_nights'] - $b['minimum_nights'];
+        });
+        booking_json(array(
+            'ok' => true,
+            'currency' => booking_setting('BOOKING_CURRENCY', 'INR'),
+            'rack_rate' => (float) booking_setting('BOOKING_RACK_RATE', 4500),
+            'plans' => $plans,
+        ));
+    }
+
     if ($action === 'booked-dates') {
         $from = isset($_GET['from']) ? booking_iso_date($_GET['from']) : booking_today();
         if (!$from) $from = booking_today();

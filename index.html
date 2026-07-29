@@ -32,7 +32,7 @@
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-7STCW44646');</script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" />
-  <link rel="stylesheet" href="css/style.css?v=20260724-google-design">
+  <link rel="stylesheet" href="css/style.css?v=20260729-dynamic-pricing">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"LodgingBusiness","@id":"https://theuppercrest.in/#lodging","name":"Upper Crest Homestay","description":"Premium furnished homestay near Cochin International Airport, Aluva Kerala.","url":"https://theuppercrest.in/","telephone":"+919292025275","address":{"@type":"PostalAddress","streetAddress":"Near Karakattuchira, Poikattusserry","addressLocality":"Aluva","addressRegion":"Kerala","postalCode":"683578","addressCountry":"IN"},"geo":{"@type":"GeoCoordinates","latitude":10.1004,"longitude":76.3569},"image":"https://theuppercrest.in/images/exterior-front-view.png","priceRange":"₹₹","checkinTime":"14:00","checkoutTime":"11:00","sameAs":["https://wa.me/919292025275"]}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Is Upper Crest a homestay near Kochi Airport?","acceptedAnswer":{"@type":"Answer","text":"Yes. Upper Crest is located about 6.5 km from Cochin International Airport, making it ideal for airport stayovers, families, married couples and travellers."}},{"@type":"Question","name":"How far is Upper Crest from Cochin International Airport?","acceptedAnswer":{"@type":"Answer","text":"Upper Crest Homestay is approximately 6.5 km from Cochin International Airport (COK)."}}]}</script>
 </head>
@@ -82,7 +82,7 @@
           <h2>Simple, Transparent Pricing</h2>
           <p>No hidden charges. What you see is what you pay. All rates include full use of amenities.</p>
         </div>
-        <div class="pricing-wrap" style="grid-template-columns:repeat(2,1fr);max-width:680px;margin:0 auto 32px">
+        <div class="pricing-wrap dynamic-pricing" id="dynamicPricing">
           <div class="price-card">
             <div class="price-label">Per Night</div>
             <div class="price-old"><sup>₹</sup>4,500</div>
@@ -111,7 +111,7 @@
             <button class="btn btn-primary" style="width:100%" onclick="openPanel()"><i class="fa-solid fa-calendar-check" style="margin-right:6px"></i>Reserve Your Dates</button>
           </div>
         </div>
-        <p class="price-note" style="text-align:center"><i class="fa-solid fa-circle-info" style="margin-right:5px"></i>Rates subject to availability. Only 1 unit — once booked, dates are gone. WhatsApp us for extended stay rates.</p>
+        <p class="price-note" id="dynamicPricingNote" style="text-align:center"><i class="fa-solid fa-circle-info" style="margin-right:5px"></i>Rates subject to availability. Only 1 unit — once booked, dates are gone. Longer stays receive lower daily rates automatically.</p>
       </div>
     </section>
 
@@ -204,6 +204,6 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
-  <script src="js/main.js?v=20260728-booking-engine" defer></script>
+  <script src="js/main.js?v=20260729-dynamic-pricing" defer></script>
 </body>
 </html>

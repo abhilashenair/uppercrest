@@ -12,6 +12,59 @@ fetch(SCRIPT_URL+"?action=booked-dates")
   })
   .catch(function(){initPickers();});
 
+loadPricingTable();
+
+function loadPricingTable(){
+  var wrap=document.getElementById("dynamicPricing");
+  if(!wrap) return;
+  fetch(SCRIPT_URL+"?action=rate-plan")
+    .then(function(r){return r.json();})
+    .then(function(data){
+      if(!data.ok||!Array.isArray(data.plans)||!data.plans.length) return;
+      renderPricingTable(data);
+    })
+    .catch(function(){});
+}
+
+function renderPricingTable(data){
+  var wrap=document.getElementById("dynamicPricing");
+  if(!wrap) return;
+  var currency=data.currency||"INR";
+  var rackRate=Number(data.rack_rate||4500);
+  var plans=data.plans.slice().sort(function(a,b){return Number(a.minimum_nights)-Number(b.minimum_nights);});
+  wrap.innerHTML=plans.map(function(plan){
+    var nights=Number(plan.minimum_nights||1);
+    var rate=Number(plan.nightly_rate||0);
+    var total=Number(plan.total||nights*rate);
+    var oldTotal=nights*rackRate;
+    var save=Math.max(0,oldTotal-total);
+    var popular=nights===7 ? " popular" : "";
+    var badge=nights===7 ? '<div class="price-badge">Best Value</div>' : "";
+    var label=nights===1 ? "Per Night" : nights+"+ Nights";
+    var per=nights===1 ? "offer price per night" : "daily rate for "+nights+"+ night stays";
+    var totalLine=nights===1 ? "Book single-night stays" : "Example "+nights+" nights: "+currency+" "+formatMoney(total);
+    var saveLine=save ? "Save "+currency+" "+formatMoney(save)+" vs rack rate" : "Best available rate";
+    return '<div class="price-card'+popular+'">'+badge+
+      '<div class="price-label">'+label+'</div>'+
+      '<div class="price-old"><sup>₹</sup>'+formatMoney(oldTotal/nights)+'</div>'+
+      '<div class="price-amount"><sup>₹</sup>'+formatMoney(rate)+'</div>'+
+      '<div class="price-per">'+per+'</div>'+
+      '<ul class="price-features">'+
+      '<li>'+totalLine+'</li>'+
+      '<li>'+saveLine+'</li>'+
+      '<li>Full apartment access</li>'+
+      '<li>All amenities included</li>'+
+      '</ul>'+
+      '<button class="btn btn-primary" style="width:100%" onclick="openPanel()"><i class="fa-solid fa-calendar-check" style="margin-right:6px"></i>Reserve Your Dates</button>'+
+      '</div>';
+  }).join("");
+}
+
+function formatMoney(value){
+  value=Number(value||0);
+  return value.toLocaleString("en-IN",{maximumFractionDigits:0});
+}
+
 function normalizeBookings(rows,assumeConfirmed){
   return rows.map(function(row){
     var status=String(getValue(row,["status","Status","booking_status","Booking Status"])||"").trim().toLowerCase();

@@ -31,7 +31,10 @@ function renderPricingTable(data){
   if(!wrap) return;
   var currency=data.currency||"INR";
   var rackRate=Number(data.rack_rate||4500);
-  var plans=data.plans.slice().sort(function(a,b){return Number(a.minimum_nights)-Number(b.minimum_nights);});
+  var visibleNights={1:true,2:true,7:true};
+  var plans=data.plans.slice().filter(function(plan){
+    return visibleNights[Number(plan.minimum_nights||1)];
+  }).sort(function(a,b){return Number(a.minimum_nights)-Number(b.minimum_nights);});
   wrap.innerHTML=plans.map(function(plan){
     var nights=Number(plan.minimum_nights||1);
     var rate=Number(plan.nightly_rate||0);

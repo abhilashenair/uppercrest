@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="robots" content="noindex, nofollow" />
+  <meta name="robots" content="noindex, nofollow, noarchive" />
+  <meta name="googlebot" content="noindex, nofollow, noarchive" />
   <meta name="theme-color" content="#6f4e37" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -18,7 +19,6 @@
     .admin-app-brand{display:flex;align-items:center;gap:14px;margin-bottom:22px}.admin-app-logo{width:62px;height:62px;border-radius:18px;object-fit:cover;border:1px solid rgba(111,78,55,.16)}
     .admin-app-brand h1{font-size:25px;line-height:1.15;margin:0;color:#17130f;letter-spacing:0}.admin-app-brand p{font-size:13px;color:#796d62;font-weight:800;margin-top:4px}
     .admin-app-grid{display:grid;gap:12px}.admin-app-btn{width:100%;min-height:54px;padding:14px 18px}.admin-app-status{margin-top:18px;background:#fff8ed;border:1px solid rgba(111,78,55,.16);border-radius:16px;padding:14px;color:#4b4037;font-size:13px;line-height:1.55}.admin-app-status strong{display:block;color:#17130f;margin-bottom:4px}
-    .admin-app-links{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}.admin-app-links a{background:#f7efe2;border:1px solid rgba(111,78,55,.14);border-radius:14px;padding:12px;text-align:center;font-size:13px;font-weight:900;color:#6f4e37}
     .install-help{margin-top:14px;display:grid;gap:10px}.install-help details{background:#fff;border:1px solid rgba(111,78,55,.16);border-radius:14px;padding:12px 14px}.install-help summary{font-size:14px;color:#17130f}.install-help ol{padding-left:18px;margin-top:8px;color:#4b4037;font-size:13px;line-height:1.55}.install-help li{margin-bottom:4px}
   </style>
 </head>
@@ -28,19 +28,13 @@
       <img class="admin-app-logo" src="images/logouppercrest.png" alt="Upper Crest" />
       <div>
         <h1>Upper Crest Admin</h1>
-        <p>Booking, rates and availability</p>
+        <p>Private booking dashboard</p>
       </div>
     </div>
     <div class="admin-app-grid">
-      <a class="btn btn-primary admin-app-btn" href="booking-admin.php?page=calendar">Open Admin Login</a>
+      <a class="btn btn-primary admin-app-btn" href="booking-admin.php">Open Admin Login</a>
       <button class="btn btn-light admin-app-btn" id="installAdminApp" type="button" hidden>Install App</button>
       <button class="btn btn-light admin-app-btn" id="enableAdminNotifications" type="button">Enable Booking Alerts</button>
-    </div>
-    <div class="admin-app-links">
-      <a href="booking-admin.php?page=recent-reservations">Reservations</a>
-      <a href="booking-admin.php?page=rate-discounts">Discounts</a>
-      <a href="booking-admin.php?page=open-close-date">Open / Close</a>
-      <a href="booking-admin.php?page=hotel-apis">Hotel APIs</a>
     </div>
     <div class="admin-app-status">
       <strong>Phone setup</strong>

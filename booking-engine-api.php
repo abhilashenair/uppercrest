@@ -20,22 +20,28 @@ try {
     }
 
     if ($action === 'rate-plan') {
+        $start = isset($_GET['start']) ? booking_iso_date($_GET['start']) : booking_today();
+        if (!$start || $start < booking_today()) $start = booking_today();
         $plans = array();
-        foreach (booking_rate_plan() as $minimumNights => $rate) {
+        foreach (array(1, 2, 7) as $minimumNights) {
+            $checkOut = date('Y-m-d', strtotime($start . ' +' . $minimumNights . ' days'));
+            $result = booking_availability($start, $checkOut);
             $plans[] = array(
                 'minimum_nights' => (int) $minimumNights,
-                'nightly_rate' => (float) $rate,
-                'currency' => booking_setting('BOOKING_CURRENCY', 'INR'),
-                'total' => (int) $minimumNights * (float) $rate,
+                'nightly_rate' => (float) $result['base_rate'],
+                'currency' => $result['currency'],
+                'total' => (float) $result['subtotal'],
+                'available' => (bool) $result['available'],
+                'check_in' => $result['check_in'],
+                'check_out' => $result['check_out'],
+                'rate_plan' => $result['rate_plan'],
             );
         }
-        usort($plans, function ($a, $b) {
-            return $a['minimum_nights'] - $b['minimum_nights'];
-        });
         booking_json(array(
             'ok' => true,
             'currency' => booking_setting('BOOKING_CURRENCY', 'INR'),
             'rack_rate' => (float) booking_setting('BOOKING_RACK_RATE', 4500),
+            'start_date' => $start,
             'plans' => $plans,
         ));
     }

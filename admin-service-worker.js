@@ -1,5 +1,6 @@
-const ADMIN_CACHE = 'uppercrest-admin-v1';
+const ADMIN_CACHE = 'uppercrest-admin-v2';
 const STATIC_ASSETS = [
+  './admin-app.html',
   './manifest.json',
   './js/admin-app.js',
   './css/style.css',
@@ -31,7 +32,7 @@ self.addEventListener('fetch', function(event) {
   const url = new URL(event.request.url);
   if (url.origin !== location.origin) return;
 
-  const isStatic = /\.(css|js|png|jpg|jpeg|svg|webp|json)$/i.test(url.pathname);
+  const isStatic = /\.(html|css|js|png|jpg|jpeg|svg|webp|json)$/i.test(url.pathname);
   if (!isStatic) return;
 
   event.respondWith(

@@ -130,6 +130,57 @@ function booking_rate_plan_label($nights) {
     return 'standard rate';
 }
 
+function booking_default_discount_plan() {
+    return array(
+        30 => array('minimum_nights' => 30, 'discount_percent' => 40.0, 'label' => '30+ night discount'),
+        15 => array('minimum_nights' => 15, 'discount_percent' => 25.0, 'label' => '15+ night discount'),
+        7 => array('minimum_nights' => 7, 'discount_percent' => 10.0, 'label' => '7+ night discount'),
+        2 => array('minimum_nights' => 2, 'discount_percent' => 5.0, 'label' => '2+ night discount'),
+    );
+}
+
+function booking_discount_plan() {
+    try {
+        $pdo = booking_pdo();
+        $stmt = $pdo->query('SELECT minimum_nights, discount_percent, label FROM booking_discounts ORDER BY minimum_nights DESC');
+        $plan = array();
+        foreach ($stmt->fetchAll() as $row) {
+            $minimumNights = (int) $row['minimum_nights'];
+            if ($minimumNights < 1) continue;
+            $plan[$minimumNights] = array(
+                'minimum_nights' => $minimumNights,
+                'discount_percent' => max(0, min(100, (float) $row['discount_percent'])),
+                'label' => $row['label'] ?: ($minimumNights . '+ night discount'),
+            );
+        }
+        if ($plan) return $plan;
+    } catch (Exception $e) {
+        // The table may not exist until Create / Update MySQL is run.
+    }
+    return booking_default_discount_plan();
+}
+
+function booking_discount_for_nights($nights) {
+    foreach (booking_discount_plan() as $rule) {
+        if ($nights >= (int) $rule['minimum_nights']) {
+            return $rule;
+        }
+    }
+    return array('minimum_nights' => 1, 'discount_percent' => 0.0, 'label' => 'standard rate');
+}
+
+function booking_upsert_discount($minimumNights, $discountPercent, $label) {
+    $minimumNights = max(1, (int) $minimumNights);
+    $discountPercent = max(0, min(100, (float) $discountPercent));
+    $label = trim((string) $label);
+    if ($label === '') {
+        $label = $minimumNights . '+ night discount';
+    }
+    $pdo = booking_pdo();
+    $stmt = $pdo->prepare('INSERT INTO booking_discounts (minimum_nights, discount_percent, label) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE discount_percent = VALUES(discount_percent), label = VALUES(label)');
+    $stmt->execute(array($minimumNights, $discountPercent, $label));
+}
+
 function booking_get_inventory($from, $to) {
     $pdo = booking_pdo();
     $stmt = $pdo->prepare('SELECT * FROM booking_inventory WHERE inventory_date >= ? AND inventory_date < ? ORDER BY inventory_date');
@@ -181,19 +232,23 @@ function booking_availability($checkIn, $checkOut) {
     $inventory = booking_get_inventory($checkIn, $checkOut);
     $closed = array();
     $notes = array();
-    $total = 0.0;
+    $grossTotal = 0.0;
     $defaultRate = booking_rate_for_nights($nights);
     $dailyRates = array();
     foreach (booking_date_range($checkIn, $checkOut) as $date) {
         $row = isset($inventory[$date]) ? $inventory[$date] : null;
         $rate = $row ? (float) $row['rate'] : $defaultRate;
         $dailyRates[$date] = $rate;
-        $total += $rate;
+        $grossTotal += $rate;
         if ($row && $row['status'] === 'closed') {
             $closed[] = $date;
             if (!empty($row['note'])) $notes[] = $date . ': ' . $row['note'];
         }
     }
+    $discountRule = booking_discount_for_nights($nights);
+    $discountPercent = (float) $discountRule['discount_percent'];
+    $discountAmount = round($grossTotal * ($discountPercent / 100), 2);
+    $total = max(0, $grossTotal - $discountAmount);
     $overlaps = booking_confirmed_overlaps($checkIn, $checkOut);
     foreach ($overlaps as $booking) {
         $closed[] = $booking['check_in'] . ' to ' . $booking['check_out'];
@@ -210,8 +265,12 @@ function booking_availability($checkIn, $checkOut) {
         'nights' => $nights,
         'currency' => booking_setting('BOOKING_CURRENCY', 'INR'),
         'base_rate' => round($nights ? $total / $nights : 0, 2),
-        'rate_plan' => booking_rate_plan_label($nights),
-        'tier_rate' => round($defaultRate, 2),
+        'original_base_rate' => round($nights ? $grossTotal / $nights : 0, 2),
+        'rate_plan' => $discountRule['label'],
+        'tier_rate' => round($nights ? $total / $nights : 0, 2),
+        'gross_subtotal' => round($grossTotal, 2),
+        'discount_percent' => round($discountPercent, 2),
+        'discount_amount' => $discountAmount,
         'subtotal' => round($total, 2),
         'taxes' => $taxes,
         'total' => round($total + $taxes, 2),

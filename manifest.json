@@ -2,7 +2,7 @@
   "name": "Upper Crest Booking Admin",
   "short_name": "Upper Crest",
   "description": "Mobile admin dashboard for Upper Crest Homestay booking, availability, rates, and reservations.",
-  "start_url": "booking-admin.php?page=calendar",
+  "start_url": "admin-app.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",

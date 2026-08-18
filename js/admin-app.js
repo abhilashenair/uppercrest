@@ -2,6 +2,7 @@
   var deferredPrompt=null;
   var installButton=document.getElementById('installAdminApp');
   var notifyButton=document.getElementById('enableAdminNotifications');
+  var statusBox=document.getElementById('adminAppStatus');
   var lastPendingCount=null;
   var alertTimer=null;
 
@@ -31,6 +32,7 @@
   if(notifyButton){
     if(!('Notification' in window)){
       notifyButton.hidden=true;
+      setStatus('This browser does not support notifications.');
     } else {
       notifyButton.addEventListener('click', function(){
         Notification.requestPermission().then(function(permission){
@@ -38,6 +40,8 @@
             notifyButton.textContent='Alerts On';
             notifyButton.disabled=true;
             startAlertChecks(true);
+          } else {
+            setStatus('Notifications were not allowed. You can still open the admin dashboard normally.');
           }
         });
       });
@@ -56,14 +60,18 @@
   }
 
   function checkAdminSummary(showReadyNotice){
-    fetch('booking-admin.php?admin_json=summary',{credentials:'same-origin',cache:'no-store'})
+    fetch('admin-summary.php',{credentials:'same-origin',cache:'no-store'})
       .then(function(response){return response.json();})
       .then(function(data){
-        if(!data.ok) return;
+        if(!data.ok){
+          setStatus('Login to the admin dashboard first, then return here to enable booking checks.');
+          return;
+        }
         var pending=Number(data.pending_count||0);
+        setStatus('Booking alerts are active. Pending reservations: '+pending+'.');
         if(lastPendingCount===null){
           lastPendingCount=pending;
-          if(showReadyNotice) showNotification('Upper Crest alerts enabled','We will check for pending booking enquiries while this dashboard is open.');
+          if(showReadyNotice) showNotification('Upper Crest alerts enabled','We will check for pending booking enquiries while this app is open.');
           return;
         }
         if(pending>lastPendingCount){
@@ -71,7 +79,9 @@
         }
         lastPendingCount=pending;
       })
-      .catch(function(){});
+      .catch(function(){
+        setStatus('Could not check reservations now. Keep the dashboard open and try again.');
+      });
   }
 
   function showNotification(title,body){
@@ -79,5 +89,9 @@
     try{
       new Notification(title,{body:body,icon:'images/logouppercrest.png',badge:'images/logouppercrest.png'});
     }catch(e){}
+  }
+
+  function setStatus(message){
+    if(statusBox) statusBox.textContent=message;
   }
 })();

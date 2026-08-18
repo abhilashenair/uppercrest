@@ -29,8 +29,12 @@ try {
             $plans[] = array(
                 'minimum_nights' => (int) $minimumNights,
                 'nightly_rate' => (float) $result['base_rate'],
+                'original_nightly_rate' => isset($result['original_base_rate']) ? (float) $result['original_base_rate'] : (float) $result['base_rate'],
                 'currency' => $result['currency'],
                 'total' => (float) $result['subtotal'],
+                'gross_total' => isset($result['gross_subtotal']) ? (float) $result['gross_subtotal'] : (float) $result['subtotal'],
+                'discount_percent' => isset($result['discount_percent']) ? (float) $result['discount_percent'] : 0,
+                'discount_amount' => isset($result['discount_amount']) ? (float) $result['discount_amount'] : 0,
                 'available' => (bool) $result['available'],
                 'check_in' => $result['check_in'],
                 'check_out' => $result['check_out'],

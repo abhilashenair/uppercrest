@@ -360,7 +360,7 @@ if ($loggedIn && booking_configured()) {
             <?php foreach ($reservations as $reservation): ?>
               <div class="booking-reservation-row">
                 <strong><?php echo booking_e($reservation['booking_id']); ?></strong>
-                <span><?php echo booking_e($reservation['guest_name']); ?> · <?php echo booking_e($reservation['check_in']); ?> to <?php echo booking_e($reservation['check_out']); ?></span>
+                <span><?php echo booking_e($reservation['guest_name']); ?> · Phone: <?php echo booking_e($reservation['phone'] ?: '-'); ?> · <?php echo booking_e($reservation['check_in']); ?> to <?php echo booking_e($reservation['check_out']); ?></span>
                 <form method="post" class="booking-reservation-status-form">
                   <input type="hidden" name="csrf" value="<?php echo booking_e($csrf); ?>">
                   <input type="hidden" name="booking_id" value="<?php echo booking_e($reservation['booking_id']); ?>">

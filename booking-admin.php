@@ -358,9 +358,10 @@ if ($loggedIn && booking_configured()) {
           <div class="booking-reservation-list">
             <?php if (!$reservations): ?><p class="blog-muted">No reservations yet.</p><?php endif; ?>
             <?php foreach ($reservations as $reservation): ?>
+              <?php $phoneHref = preg_replace('/[^0-9+]/', '', (string) $reservation['phone']); ?>
               <div class="booking-reservation-row">
                 <strong><?php echo booking_e($reservation['booking_id']); ?></strong>
-                <span><?php echo booking_e($reservation['guest_name']); ?> · Phone: <?php echo booking_e($reservation['phone'] ?: '-'); ?> · <?php echo booking_e($reservation['check_in']); ?> to <?php echo booking_e($reservation['check_out']); ?></span>
+                <span><?php echo booking_e($reservation['guest_name']); ?> · Phone: <?php if ($phoneHref): ?><a href="tel:<?php echo booking_e($phoneHref); ?>"><?php echo booking_e($reservation['phone']); ?></a><?php else: ?>-<?php endif; ?> · <?php echo booking_e($reservation['check_in']); ?> to <?php echo booking_e($reservation['check_out']); ?></span>
                 <form method="post" class="booking-reservation-status-form">
                   <input type="hidden" name="csrf" value="<?php echo booking_e($csrf); ?>">
                   <input type="hidden" name="booking_id" value="<?php echo booking_e($reservation['booking_id']); ?>">

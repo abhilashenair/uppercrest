@@ -5,6 +5,10 @@ session_start();
 
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
+header('X-Robots-Tag: noindex, nofollow, noarchive');
+header('X-Content-Type-Options: nosniff');
+header('Referrer-Policy: no-referrer');
+header('X-Frame-Options: DENY');
 
 if (empty($_SESSION['booking_admin'])) {
     http_response_code(403);

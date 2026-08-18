@@ -17,6 +17,7 @@ $adminPages = array(
     'add-update-reservation' => 'Add / Update Reservation',
     'calendar' => 'Calendar',
     'recent-reservations' => 'Recent Reservations',
+    'rate-discounts' => 'Rate Discounts',
     'hotel-apis' => 'Hotel APIs',
     'mysql-setup' => 'Create / Update MySQL',
 );
@@ -43,6 +44,28 @@ if ($loggedIn && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['install_
         try {
             booking_install_schema();
             $message = 'Booking engine tables are ready.';
+        } catch (Exception $e) {
+            $error = $e->getMessage();
+        }
+    }
+}
+
+if ($loggedIn && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_discounts'])) {
+    if (!booking_check_csrf()) {
+        $error = 'Session expired. Please try again.';
+    } else {
+        try {
+            if (empty($_POST['discounts']) || !is_array($_POST['discounts'])) {
+                throw new Exception('Please enter at least one discount rule.');
+            }
+            foreach ($_POST['discounts'] as $minimumNights => $rule) {
+                booking_upsert_discount(
+                    $minimumNights,
+                    isset($rule['discount_percent']) ? $rule['discount_percent'] : 0,
+                    isset($rule['label']) ? $rule['label'] : ''
+                );
+            }
+            $message = 'Rate discount rules updated.';
         } catch (Exception $e) {
             $error = $e->getMessage();
         }
@@ -149,8 +172,10 @@ $nextDay = date('Y-m-d', strtotime($monthEnd . ' +1 day'));
 $inventory = array();
 $reservations = array();
 $reservationBlocks = array();
+$discountPlan = array();
 if ($loggedIn && booking_configured()) {
     try {
+        $discountPlan = booking_discount_plan();
         $inventory = booking_get_inventory($month, $nextDay);
         $pdo = booking_pdo();
         $stmt = $pdo->prepare('SELECT * FROM booking_reservations WHERE check_in < ? AND check_out > ? ORDER BY check_in DESC LIMIT 50');
@@ -216,8 +241,9 @@ if ($loggedIn && booking_configured()) {
           <a class="<?php echo $activePage === 'add-update-reservation' ? 'active' : ''; ?>" href="booking-admin.php?page=add-update-reservation">2. Add / Update Reservation</a>
           <a class="<?php echo $activePage === 'calendar' ? 'active' : ''; ?>" href="booking-admin.php?page=calendar">3. Calendar</a>
           <a class="<?php echo $activePage === 'recent-reservations' ? 'active' : ''; ?>" href="booking-admin.php?page=recent-reservations">4. Recent Reservations</a>
-          <a class="<?php echo $activePage === 'hotel-apis' ? 'active' : ''; ?>" href="booking-admin.php?page=hotel-apis">5. Hotel APIs</a>
-          <a class="<?php echo $activePage === 'mysql-setup' ? 'active' : ''; ?>" href="booking-admin.php?page=mysql-setup">6. Create / Update MySQL</a>
+          <a class="<?php echo $activePage === 'rate-discounts' ? 'active' : ''; ?>" href="booking-admin.php?page=rate-discounts">5. Rate Discounts</a>
+          <a class="<?php echo $activePage === 'hotel-apis' ? 'active' : ''; ?>" href="booking-admin.php?page=hotel-apis">6. Hotel APIs</a>
+          <a class="<?php echo $activePage === 'mysql-setup' ? 'active' : ''; ?>" href="booking-admin.php?page=mysql-setup">7. Create / Update MySQL</a>
         </nav>
 
         <h2 class="booking-admin-page-title"><?php echo booking_e($adminPages[$activePage]); ?></h2>
@@ -351,6 +377,29 @@ if ($loggedIn && booking_configured()) {
         </section>
         <?php endif; ?>
 
+        <?php if ($activePage === 'rate-discounts'): ?>
+        <section class="blog-admin-card" id="rate-discounts">
+          <h2>Length-of-stay Discounts</h2>
+          <p class="blog-muted">Discounts are applied after adding the actual inventory rates for the selected dates.</p>
+          <form method="post">
+            <input type="hidden" name="csrf" value="<?php echo booking_e($csrf); ?>">
+            <?php foreach ($discountPlan as $minimumNights => $rule): ?>
+              <div class="blog-admin-row">
+                <div>
+                  <label><?php echo (int) $minimumNights; ?>+ Nights Label</label>
+                  <input type="text" name="discounts[<?php echo (int) $minimumNights; ?>][label]" value="<?php echo booking_e($rule['label']); ?>">
+                </div>
+                <div>
+                  <label>Discount %</label>
+                  <input type="number" name="discounts[<?php echo (int) $minimumNights; ?>][discount_percent]" min="0" max="100" step="0.01" value="<?php echo booking_e($rule['discount_percent']); ?>">
+                </div>
+              </div>
+            <?php endforeach; ?>
+            <button class="btn btn-primary" type="submit" name="save_discounts" value="1">Save Discount Rules</button>
+          </form>
+        </section>
+        <?php endif; ?>
+
         <?php if ($activePage === 'hotel-apis' || $activePage === 'mysql-setup'): ?>
         <div class="booking-admin-grid booking-admin-bottom-grid">
           <?php if ($activePage === 'hotel-apis'): ?>
@@ -369,6 +418,12 @@ if ($loggedIn && booking_configured()) {
               <strong>Current rate plan</strong>
               <?php foreach (booking_rate_plan() as $minimumNights => $rate): ?>
                 <span><?php echo (int) $minimumNights; ?>+ nights: INR <?php echo booking_e(number_format((float) $rate, 0)); ?> / night</span>
+              <?php endforeach; ?>
+            </div>
+            <div class="booking-rate-plan">
+              <strong>Current discount rules</strong>
+              <?php foreach (booking_discount_plan() as $rule): ?>
+                <span><?php echo (int) $rule['minimum_nights']; ?>+ nights: <?php echo booking_e(number_format((float) $rule['discount_percent'], 2)); ?>% off</span>
               <?php endforeach; ?>
             </div>
           </section>

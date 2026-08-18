@@ -19,6 +19,7 @@
     .admin-app-brand h1{font-size:25px;line-height:1.15;margin:0;color:#17130f;letter-spacing:0}.admin-app-brand p{font-size:13px;color:#796d62;font-weight:800;margin-top:4px}
     .admin-app-grid{display:grid;gap:12px}.admin-app-btn{width:100%;min-height:54px;padding:14px 18px}.admin-app-status{margin-top:18px;background:#fff8ed;border:1px solid rgba(111,78,55,.16);border-radius:16px;padding:14px;color:#4b4037;font-size:13px;line-height:1.55}.admin-app-status strong{display:block;color:#17130f;margin-bottom:4px}
     .admin-app-links{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}.admin-app-links a{background:#f7efe2;border:1px solid rgba(111,78,55,.14);border-radius:14px;padding:12px;text-align:center;font-size:13px;font-weight:900;color:#6f4e37}
+    .install-help{margin-top:14px;display:grid;gap:10px}.install-help details{background:#fff;border:1px solid rgba(111,78,55,.16);border-radius:14px;padding:12px 14px}.install-help summary{font-size:14px;color:#17130f}.install-help ol{padding-left:18px;margin-top:8px;color:#4b4037;font-size:13px;line-height:1.55}.install-help li{margin-bottom:4px}
   </style>
 </head>
 <body class="admin-app-page">
@@ -43,7 +44,27 @@
     </div>
     <div class="admin-app-status">
       <strong>Phone setup</strong>
-      <span id="adminAppStatus">Open this page in Safari or Chrome, then use Add to Home Screen. Alerts work while this app page is open and you are logged in to the admin dashboard.</span>
+      <span id="adminAppStatus">Open this page in Safari or Chrome. Use the instructions below if the Install App button is not shown.</span>
+      <div class="install-help">
+        <details open>
+          <summary>Install on iPhone</summary>
+          <ol>
+            <li>Open this page in Safari.</li>
+            <li>Tap the Share button.</li>
+            <li>Tap Add to Home Screen.</li>
+            <li>Tap Add.</li>
+          </ol>
+        </details>
+        <details>
+          <summary>Install on Android</summary>
+          <ol>
+            <li>Open this page in Chrome.</li>
+            <li>Tap the three-dot menu.</li>
+            <li>Tap Add to Home screen or Install app.</li>
+            <li>Tap Install or Add.</li>
+          </ol>
+        </details>
+      </div>
     </div>
   </main>
   <script src="js/admin-app.js?v=20260818-admin-pwa" defer></script>

@@ -22,22 +22,5 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ],
-  "shortcuts": [
-    {
-      "name": "Calendar",
-      "short_name": "Calendar",
-      "url": "booking-admin.php?page=calendar"
-    },
-    {
-      "name": "Reservations",
-      "short_name": "Bookings",
-      "url": "booking-admin.php?page=recent-reservations"
-    },
-    {
-      "name": "Rate Discounts",
-      "short_name": "Discounts",
-      "url": "booking-admin.php?page=rate-discounts"
-    }
   ]
 }

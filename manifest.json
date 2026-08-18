@@ -1,0 +1,43 @@
+{
+  "name": "Upper Crest Booking Admin",
+  "short_name": "Upper Crest",
+  "description": "Mobile admin dashboard for Upper Crest Homestay booking, availability, rates, and reservations.",
+  "start_url": "booking-admin.php?page=calendar",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fff8ed",
+  "theme_color": "#6f4e37",
+  "categories": ["business", "travel"],
+  "icons": [
+    {
+      "src": "images/logouppercrest.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "images/logouppercrest.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Calendar",
+      "short_name": "Calendar",
+      "url": "booking-admin.php?page=calendar"
+    },
+    {
+      "name": "Reservations",
+      "short_name": "Bookings",
+      "url": "booking-admin.php?page=recent-reservations"
+    },
+    {
+      "name": "Rate Discounts",
+      "short_name": "Discounts",
+      "url": "booking-admin.php?page=rate-discounts"
+    }
+  ]
+}

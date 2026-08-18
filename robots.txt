@@ -1,4 +1,14 @@
 User-agent: *
+Disallow: /admin-app.html
+Disallow: /admin-summary.php
+Disallow: /admin-service-worker.js
+Disallow: /admin-pwa-setup.md
+Disallow: /booking-admin.php
+Disallow: /blog-admin.php
+Disallow: /booking-admin-config.php
+Disallow: /blog-admin-config.php
+Disallow: /google-reviews-config.php
+Disallow: /manifest.json
 Allow: /
 
-Sitemap: https://www.uppercrest.in/sitemap.xml
+Sitemap: https://theuppercrest.in/sitemap.xml

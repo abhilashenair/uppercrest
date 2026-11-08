@@ -26,9 +26,12 @@ try {
         foreach (array(1, 2, 7, 15, 30) as $minimumNights) {
             $checkOut = date('Y-m-d', strtotime($start . ' +' . $minimumNights . ' days'));
             $result = booking_availability($start, $checkOut);
+            $firstRate = (float) reset($result['daily_rates']);
+            $firstNight = booking_apply_discount(array($firstRate), $result);
             $plans[] = array(
                 'minimum_nights' => (int) $minimumNights,
                 'nightly_rate' => (float) $result['base_rate'],
+                'starting_nightly_rate' => $firstNight['subtotal'],
                 'original_nightly_rate' => isset($result['original_base_rate']) ? (float) $result['original_base_rate'] : (float) $result['base_rate'],
                 'currency' => $result['currency'],
                 'total' => (float) $result['subtotal'],

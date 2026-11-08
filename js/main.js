@@ -37,28 +37,26 @@ function renderPricingTable(data){
   }).sort(function(a,b){return Number(a.minimum_nights)-Number(b.minimum_nights);});
   wrap.innerHTML=plans.map(function(plan){
     var nights=Number(plan.minimum_nights||1);
-    var rate=Number(plan.nightly_rate||0);
-    var total=Number(plan.total||nights*rate);
-    var oldTotal=nights*rackRate;
-    var save=Math.max(0,oldTotal-total);
+    var rate=Number(plan.starting_nightly_rate!=null ? plan.starting_nightly_rate : plan.nightly_rate||0);
+    var save=Math.max(0,rackRate-rate);
     var discount=Number(plan.discount_percent||0);
-    var discountAmount=Number(plan.discount_amount||0);
     var popular=nights===7 ? " popular" : "";
     var badge=nights===7 ? '<div class="price-badge">Best Value</div>' : "";
     var label=nights===1 ? "Per Night" : nights+"+ Nights";
-    var per=nights===1 ? "offer price per night" : "daily rate for "+nights+"+ night stays";
-    var totalLine=nights===1 ? "Book single-night stays" : "Example "+nights+" nights: "+currency+" "+formatMoney(total);
-    var saveLine=save ? "Save "+currency+" "+formatMoney(save)+" vs rack rate" : "Best available rate";
+    var per=nights===1 ? "per night" : "per night for "+nights+"+ night stays";
+    var rateDate=plan.check_in||data.start_date;
+    var rateLine=rateDate ? "Rate for "+formatDate(rateDate) : "Rates vary by date";
+    var saveLine=save ? "Save "+currency+" "+formatMoney(save)+" per night vs rack rate" : "Best available nightly rate";
     var discountLine=plan.discount_per_night!=null
-      ? (discountAmount ? '<li>'+currency+' '+formatMoney(discountAmount)+' stay discount applied</li>' : '')
+      ? (plan.discount_per_night ? '<li>'+currency+' '+formatMoney(plan.discount_per_night)+' discount per night</li>' : '')
       : (discount ? '<li>'+formatPercent(discount)+'% stay discount applied</li>' : '');
     return '<div class="price-card'+popular+'">'+badge+
       '<div class="price-label">'+label+'</div>'+
-      '<div class="price-old"><sup>₹</sup>'+formatMoney(oldTotal/nights)+'</div>'+
+      '<div class="price-old"><sup>₹</sup>'+formatMoney(rackRate)+'</div>'+
       '<div class="price-amount"><sup>₹</sup>'+formatMoney(rate)+'</div>'+
       '<div class="price-per">'+per+'</div>'+
       '<ul class="price-features">'+
-      '<li>'+totalLine+'</li>'+
+      '<li>'+rateLine+'</li>'+
       discountLine+
       '<li>'+saveLine+'</li>'+
       '<li>Full apartment access</li>'+

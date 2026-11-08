@@ -1,0 +1,40 @@
+.booking-admin-wrap .blog-admin-shell{max-width:1500px}
+.booking-admin-wrap .blog-admin-head{flex-direction:row;align-items:center}
+.booking-admin-wrap .blog-admin-head>div{flex:1;min-width:0}
+.booking-admin-wrap .blog-admin-head h1{font-size:30px;letter-spacing:0}
+.booking-menu-toggle{display:grid;place-items:center;flex:0 0 44px;width:44px;height:44px;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--brown);cursor:pointer;font-size:20px}
+.booking-menu-toggle:focus-visible{outline:2px solid var(--brown);outline-offset:3px}
+.booking-admin-layout{display:grid;grid-template-columns:240px minmax(0,1fr);gap:24px;align-items:start}
+.booking-admin-layout.menu-collapsed{grid-template-columns:minmax(0,1fr)}
+.booking-admin-layout .booking-admin-menu{position:sticky;top:18px;display:flex;flex-direction:column;gap:6px;border:0;border-right:1px solid var(--border);border-radius:0;padding:0 16px 0 0;margin:0;background:transparent;box-shadow:none;backdrop-filter:none}
+.booking-admin-layout .booking-admin-menu[hidden]{display:none}
+.booking-admin-layout .booking-admin-menu a{justify-content:flex-start;gap:12px;text-align:left;border-radius:8px;padding:12px;min-height:48px;line-height:1.4}
+.booking-admin-menu i{flex:0 0 18px;text-align:center}
+.booking-admin-menu span{overflow-wrap:anywhere}
+.booking-admin-content{min-width:0}
+.booking-admin-content .blog-admin-card{border-radius:8px}
+.booking-admin-content .booking-day{min-width:0}
+.booking-admin-content .booking-day-top{flex-wrap:wrap}
+.booking-admin-content .booking-day-edit{grid-template-columns:minmax(0,1fr)}
+.booking-admin-content .booking-reservation-row{grid-template-columns:minmax(100px,.7fr) minmax(0,1fr)}
+.booking-admin-content .booking-reservation-row strong,.booking-admin-content .booking-reservation-row span{overflow-wrap:anywhere}
+.booking-admin-content .booking-reservation-status-form{grid-column:1/-1}
+@media(max-width:980px){
+  .booking-admin-layout{grid-template-columns:200px minmax(0,1fr);gap:16px}
+  .booking-admin-content .booking-calendar-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .booking-admin-content .booking-day-head{display:none}
+  .booking-admin-content .booking-day.muted{display:none}
+}
+@media(max-width:620px){
+  body.blog-admin-page{padding-bottom:0}
+  .booking-admin-wrap{padding:20px 12px}
+  .booking-admin-wrap .blog-admin-head{gap:10px}
+  .booking-admin-wrap .blog-admin-head h1{font-size:23px}
+  .booking-admin-wrap .eyebrow{font-size:10px;letter-spacing:0}
+  .booking-admin-layout{grid-template-columns:minmax(0,1fr)}
+  .booking-admin-layout .booking-admin-menu{position:static;border-right:0;border-bottom:1px solid var(--border);padding:0 0 16px}
+  .booking-admin-content .blog-admin-card{padding:16px}
+  .booking-admin-content .booking-reservation-row{grid-template-columns:minmax(0,1fr)}
+  .booking-month-nav{gap:8px}
+  .booking-month-nav h2{font-size:18px;margin:0}
+}

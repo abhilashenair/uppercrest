@@ -35,6 +35,7 @@ try {
                 'gross_total' => isset($result['gross_subtotal']) ? (float) $result['gross_subtotal'] : (float) $result['subtotal'],
                 'discount_percent' => isset($result['discount_percent']) ? (float) $result['discount_percent'] : 0,
                 'discount_amount' => isset($result['discount_amount']) ? (float) $result['discount_amount'] : 0,
+                'discount_per_night' => isset($result['discount_per_night']) ? (float) $result['discount_per_night'] : null,
                 'available' => (bool) $result['available'],
                 'check_in' => $result['check_in'],
                 'check_out' => $result['check_out'],

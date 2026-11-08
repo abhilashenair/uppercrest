@@ -58,15 +58,20 @@ if ($loggedIn && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_dis
             if (empty($_POST['discounts']) || !is_array($_POST['discounts'])) {
                 throw new Exception('Please enter at least one discount rule.');
             }
+            $pdo = booking_pdo();
+            $pdo->beginTransaction();
             foreach ($_POST['discounts'] as $minimumNights => $rule) {
+                if (!is_array($rule)) throw new Exception('Invalid discount rule.');
                 booking_upsert_discount(
                     $minimumNights,
-                    isset($rule['discount_percent']) ? $rule['discount_percent'] : 0,
+                    isset($rule['discount_per_night']) ? $rule['discount_per_night'] : '',
                     isset($rule['label']) ? $rule['label'] : ''
                 );
             }
+            $pdo->commit();
             $message = 'Rate discount rules updated.';
         } catch (Exception $e) {
+            if (isset($pdo) && $pdo->inTransaction()) $pdo->rollBack();
             $error = $e->getMessage();
         }
     }
@@ -205,6 +210,8 @@ if ($loggedIn && booking_configured()) {
   <meta name="robots" content="noindex, nofollow" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" />
   <link rel="stylesheet" href="css/style.css?v=20260728-booking-engine-5">
+  <link rel="stylesheet" href="css/booking-admin.css?v=20261108">
+  <script src="js/booking-admin-menu.js?v=20261108" defer></script>
   <!-- Google Tag Manager -->
   <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-N48QGRBB');</script>
   <!-- End Google Tag Manager -->
@@ -213,6 +220,9 @@ if ($loggedIn && booking_configured()) {
   <main class="blog-admin-wrap booking-admin-wrap">
     <div class="blog-admin-shell">
       <div class="blog-admin-head">
+        <?php if ($loggedIn): ?>
+        <button type="button" class="booking-menu-toggle" id="bookingMenuToggle" aria-controls="bookingAdminMenu" aria-expanded="true" aria-label="Toggle navigation" title="Toggle navigation"><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
+        <?php endif; ?>
         <div>
           <div class="eyebrow">Upper Crest Homestay</div>
           <h1>Booking Engine</h1>
@@ -236,16 +246,14 @@ if ($loggedIn && booking_configured()) {
         <?php if ($message): ?><div class="blog-admin-alert success"><?php echo booking_e($message); ?></div><?php endif; ?>
         <?php if ($error): ?><div class="blog-admin-alert error"><?php echo booking_e($error); ?></div><?php endif; ?>
 
-        <nav class="booking-admin-menu" aria-label="Booking admin menu">
-          <a class="<?php echo $activePage === 'open-close-date' ? 'active' : ''; ?>" href="booking-admin.php?page=open-close-date">1. Open or Close Date</a>
-          <a class="<?php echo $activePage === 'add-update-reservation' ? 'active' : ''; ?>" href="booking-admin.php?page=add-update-reservation">2. Add / Update Reservation</a>
-          <a class="<?php echo $activePage === 'calendar' ? 'active' : ''; ?>" href="booking-admin.php?page=calendar">3. Calendar</a>
-          <a class="<?php echo $activePage === 'recent-reservations' ? 'active' : ''; ?>" href="booking-admin.php?page=recent-reservations">4. Recent Reservations</a>
-          <a class="<?php echo $activePage === 'rate-discounts' ? 'active' : ''; ?>" href="booking-admin.php?page=rate-discounts">5. Rate Discounts</a>
-          <a class="<?php echo $activePage === 'hotel-apis' ? 'active' : ''; ?>" href="booking-admin.php?page=hotel-apis">6. Hotel APIs</a>
-          <a class="<?php echo $activePage === 'mysql-setup' ? 'active' : ''; ?>" href="booking-admin.php?page=mysql-setup">7. Create / Update MySQL</a>
+        <div class="booking-admin-layout" id="bookingAdminLayout">
+        <nav class="booking-admin-menu" id="bookingAdminMenu" aria-label="Booking admin menu">
+          <?php $menuIcons = array('open-close-date' => 'calendar-xmark', 'add-update-reservation' => 'pen-to-square', 'calendar' => 'calendar-days', 'recent-reservations' => 'list', 'rate-discounts' => 'tag', 'hotel-apis' => 'code', 'mysql-setup' => 'database'); ?>
+          <?php foreach ($adminPages as $page => $title): ?>
+          <a class="<?php echo $activePage === $page ? 'active' : ''; ?>" <?php if ($activePage === $page): ?>aria-current="page"<?php endif; ?> href="booking-admin.php?page=<?php echo booking_e($page); ?>"><i class="fa-solid fa-<?php echo $menuIcons[$page]; ?>" aria-hidden="true"></i><span><?php echo booking_e($title); ?></span></a>
+          <?php endforeach; ?>
         </nav>
-
+        <div class="booking-admin-content">
         <h2 class="booking-admin-page-title"><?php echo booking_e($adminPages[$activePage]); ?></h2>
 
         <?php if ($activePage === 'open-close-date' || $activePage === 'add-update-reservation'): ?>
@@ -381,18 +389,21 @@ if ($loggedIn && booking_configured()) {
         <?php if ($activePage === 'rate-discounts'): ?>
         <section class="blog-admin-card" id="rate-discounts">
           <h2>Length-of-stay Discounts</h2>
-          <p class="blog-muted">Discounts are applied after adding the actual inventory rates for the selected dates.</p>
+          <p class="blog-muted">Enter the amount off each night's inventory rate in <?php echo booking_e(booking_setting('BOOKING_CURRENCY', 'INR')); ?>. The longest matching stay rule applies, without combining discounts. A nightly rate cannot fall below zero.</p>
+          <p class="blog-muted">Run Create / Update MySQL Tables before saving price discounts. Existing percentage rules remain active until you save replacement amounts.</p>
           <form method="post">
             <input type="hidden" name="csrf" value="<?php echo booking_e($csrf); ?>">
-            <?php foreach ($discountPlan as $minimumNights => $rule): ?>
+            <?php $editableDiscountPlan = $discountPlan ?: booking_default_discount_plan(); ksort($editableDiscountPlan, SORT_NUMERIC); ?>
+            <?php foreach ($editableDiscountPlan as $minimumNights => $rule): ?>
               <div class="blog-admin-row">
                 <div>
                   <label><?php echo (int) $minimumNights; ?>+ Nights Label</label>
                   <input type="text" name="discounts[<?php echo (int) $minimumNights; ?>][label]" value="<?php echo booking_e($rule['label']); ?>">
                 </div>
                 <div>
-                  <label>Discount %</label>
-                  <input type="number" name="discounts[<?php echo (int) $minimumNights; ?>][discount_percent]" min="0" max="100" step="0.01" value="<?php echo booking_e($rule['discount_percent']); ?>">
+                  <label>Discount per night (<?php echo booking_e(booking_setting('BOOKING_CURRENCY', 'INR')); ?>)</label>
+                  <input type="number" name="discounts[<?php echo (int) $minimumNights; ?>][discount_per_night]" min="0" max="99999999.99" step="0.01" required value="<?php echo isset($rule['discount_per_night']) ? booking_e($rule['discount_per_night']) : ''; ?>">
+                  <?php if (!isset($rule['discount_per_night']) && $rule['discount_percent'] > 0): ?><small class="blog-muted">Currently <?php echo booking_e($rule['discount_percent']); ?>% off. Enter its replacement amount.</small><?php endif; ?>
                 </div>
               </div>
             <?php endforeach; ?>
@@ -424,7 +435,7 @@ if ($loggedIn && booking_configured()) {
             <div class="booking-rate-plan">
               <strong>Current discount rules</strong>
               <?php foreach (booking_discount_plan() as $rule): ?>
-                <span><?php echo (int) $rule['minimum_nights']; ?>+ nights: <?php echo booking_e(number_format((float) $rule['discount_percent'], 2)); ?>% off</span>
+                <span><?php echo (int) $rule['minimum_nights']; ?>+ nights: <?php echo isset($rule['discount_per_night']) ? booking_e(booking_setting('BOOKING_CURRENCY', 'INR') . ' ' . number_format($rule['discount_per_night'], 2)) . ' off per night' : booking_e(number_format((float) $rule['discount_percent'], 2)) . '% off (legacy)'; ?></span>
               <?php endforeach; ?>
             </div>
           </section>
@@ -442,6 +453,8 @@ if ($loggedIn && booking_configured()) {
           <?php endif; ?>
         </div>
         <?php endif; ?>
+        </div>
+        </div>
       <?php endif; ?>
     </div>
   </main>

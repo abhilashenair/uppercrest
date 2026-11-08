@@ -47,6 +47,10 @@ function booking_install_schema() {
             $pdo->exec($statement);
         }
     }
+    $columns = $pdo->query('SHOW COLUMNS FROM booking_discounts')->fetchAll(PDO::FETCH_COLUMN);
+    if (!in_array('discount_per_night', $columns, true)) {
+        $pdo->exec('ALTER TABLE booking_discounts ADD COLUMN discount_per_night DECIMAL(10,2) NULL DEFAULT NULL');
+    }
 }
 
 function booking_e($value) {
@@ -136,13 +140,14 @@ function booking_default_discount_plan() {
         15 => array('minimum_nights' => 15, 'discount_percent' => 25.0, 'label' => '15+ night discount'),
         7 => array('minimum_nights' => 7, 'discount_percent' => 10.0, 'label' => '7+ night discount'),
         2 => array('minimum_nights' => 2, 'discount_percent' => 5.0, 'label' => '2+ night discount'),
+        1 => array('minimum_nights' => 1, 'discount_percent' => 0.0, 'discount_per_night' => 0.0, 'label' => '1+ night discount'),
     );
 }
 
 function booking_discount_plan() {
     try {
         $pdo = booking_pdo();
-        $stmt = $pdo->query('SELECT minimum_nights, discount_percent, label FROM booking_discounts ORDER BY minimum_nights DESC');
+        $stmt = $pdo->query('SELECT * FROM booking_discounts ORDER BY minimum_nights DESC');
         $plan = array();
         foreach ($stmt->fetchAll() as $row) {
             $minimumNights = (int) $row['minimum_nights'];
@@ -150,10 +155,15 @@ function booking_discount_plan() {
             $plan[$minimumNights] = array(
                 'minimum_nights' => $minimumNights,
                 'discount_percent' => max(0, min(100, (float) $row['discount_percent'])),
+                'discount_per_night' => isset($row['discount_per_night']) ? max(0, (float) $row['discount_per_night']) : null,
                 'label' => $row['label'] ?: ($minimumNights . '+ night discount'),
             );
         }
-        if ($plan) return $plan;
+        if ($plan) {
+            if (!isset($plan[1])) $plan[1] = booking_default_discount_plan()[1];
+            krsort($plan, SORT_NUMERIC);
+            return $plan;
+        }
     } catch (Exception $e) {
         // The table may not exist until Create / Update MySQL is run.
     }
@@ -169,16 +179,43 @@ function booking_discount_for_nights($nights) {
     return array('minimum_nights' => 1, 'discount_percent' => 0.0, 'label' => 'standard rate');
 }
 
-function booking_upsert_discount($minimumNights, $discountPercent, $label) {
-    $minimumNights = max(1, (int) $minimumNights);
-    $discountPercent = max(0, min(100, (float) $discountPercent));
+function booking_upsert_discount($minimumNights, $discountPerNight, $label) {
+    if (!ctype_digit((string) $minimumNights) || (int) $minimumNights < 1) {
+        throw new Exception('Minimum nights must be a positive whole number.');
+    }
+    if (!is_scalar($discountPerNight) || !is_numeric($discountPerNight) || !is_finite((float) $discountPerNight) || (float) $discountPerNight < 0 || (float) $discountPerNight > 99999999.99) {
+        throw new Exception('Enter a valid discount amount of zero or more.');
+    }
+    $minimumNights = (int) $minimumNights;
+    $discountPerNight = round((float) $discountPerNight, 2);
     $label = trim((string) $label);
     if ($label === '') {
         $label = $minimumNights . '+ night discount';
     }
     $pdo = booking_pdo();
-    $stmt = $pdo->prepare('INSERT INTO booking_discounts (minimum_nights, discount_percent, label) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE discount_percent = VALUES(discount_percent), label = VALUES(label)');
-    $stmt->execute(array($minimumNights, $discountPercent, $label));
+    $stmt = $pdo->prepare('INSERT INTO booking_discounts (minimum_nights, discount_percent, discount_per_night, label) VALUES (?, 0, ?, ?) ON DUPLICATE KEY UPDATE discount_percent = 0, discount_per_night = VALUES(discount_per_night), label = VALUES(label)');
+    $stmt->execute(array($minimumNights, $discountPerNight, $label));
+}
+
+function booking_apply_discount($dailyRates, $rule) {
+    $gross = round(array_sum($dailyRates), 2);
+    $fixed = isset($rule['discount_per_night']);
+    $subtotal = $gross;
+    if ($fixed) {
+        $subtotal = 0.0;
+        foreach ($dailyRates as $rate) {
+            $subtotal += max(0, round($rate - $rule['discount_per_night'], 2));
+        }
+    } else {
+        $subtotal -= round($gross * ($rule['discount_percent'] / 100), 2);
+    }
+    $subtotal = round($subtotal, 2);
+    return array(
+        'subtotal' => $subtotal,
+        'discount_amount' => round($gross - $subtotal, 2),
+        'discount_per_night' => $fixed ? (float) $rule['discount_per_night'] : null,
+        'discount_percent' => $fixed ? 0.0 : (float) $rule['discount_percent'],
+    );
 }
 
 function booking_get_inventory($from, $to) {
@@ -246,9 +283,10 @@ function booking_availability($checkIn, $checkOut) {
         }
     }
     $discountRule = booking_discount_for_nights($nights);
-    $discountPercent = (float) $discountRule['discount_percent'];
-    $discountAmount = round($grossTotal * ($discountPercent / 100), 2);
-    $total = max(0, $grossTotal - $discountAmount);
+    $pricing = booking_apply_discount($dailyRates, $discountRule);
+    $discountPercent = $pricing['discount_percent'];
+    $discountAmount = $pricing['discount_amount'];
+    $total = $pricing['subtotal'];
     $overlaps = booking_confirmed_overlaps($checkIn, $checkOut);
     foreach ($overlaps as $booking) {
         $closed[] = $booking['check_in'] . ' to ' . $booking['check_out'];
@@ -270,6 +308,7 @@ function booking_availability($checkIn, $checkOut) {
         'tier_rate' => round($nights ? $total / $nights : 0, 2),
         'gross_subtotal' => round($grossTotal, 2),
         'discount_percent' => round($discountPercent, 2),
+        'discount_per_night' => $pricing['discount_per_night'],
         'discount_amount' => $discountAmount,
         'subtotal' => round($total, 2),
         'taxes' => $taxes,

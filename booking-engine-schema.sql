@@ -26,11 +26,13 @@ CREATE TABLE IF NOT EXISTS booking_reservations (
 CREATE TABLE IF NOT EXISTS booking_discounts (
   minimum_nights INT NOT NULL PRIMARY KEY,
   discount_percent DECIMAL(5,2) NOT NULL DEFAULT 0.00,
+  discount_per_night DECIMAL(10,2) NULL DEFAULT NULL,
   label VARCHAR(80) DEFAULT NULL,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO booking_discounts (minimum_nights, discount_percent, label) VALUES
+  (1, 0.00, '1+ night discount'),
   (2, 5.00, '2+ night discount'),
   (7, 10.00, '7+ night discount'),
   (15, 25.00, '15+ night discount'),

@@ -23,7 +23,7 @@ try {
         $start = isset($_GET['start']) ? booking_iso_date($_GET['start']) : booking_today();
         if (!$start || $start < booking_today()) $start = booking_today();
         $plans = array();
-        foreach (array(1, 2, 7) as $minimumNights) {
+        foreach (array(1, 2, 7, 15, 30) as $minimumNights) {
             $checkOut = date('Y-m-d', strtotime($start . ' +' . $minimumNights . ' days'));
             $result = booking_availability($start, $checkOut);
             $plans[] = array(
